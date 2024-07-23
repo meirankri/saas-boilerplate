@@ -68,3 +68,7 @@ We welcome contributions to this project! Please feel free to fork the repositor
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Hire Me
+
+Are you looking for a developer to bring your next project to life or enhance your team? I specialize in full-stack development and am eager to help make your vision a reality. Let's connect! Contact me at [meirankri@gmail.com](mailto:meirankri+saasboilerplate@gmail.com) for consultancy or potential collaborations.
