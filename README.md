@@ -1,65 +1,70 @@
-# Username and password authentication template for Next 14
+# SaaS Boilerplate Project
 
-## Youtube tutorial - username, password authentication
-https://www.youtube.com/watch?v=JIIy7VkiTqU
+Welcome to our SaaS Boilerplate Project, an all-in-one starter kit designed to jumpstart your next SaaS application. This boilerplate is built on Next.js using the new App Router, integrated with a variety of authentication methods and powerful backend technologies to provide a robust foundation for scaling your application.
 
-## Youtube tutorial - email, password with email verification
+## Features
 
-https://www.youtube.com/watch?v=2sHsP_8YLHA&t=1s
+- **Authentication**: Seamless authentication setup using Lucia-auth with support for Magic Link, Google, Facebook, and GitHub sign-ins.
+- **Payments**: Integrated with Stripe for handling subscription-based models. Multiple subscription plans are supported to cater to a diverse customer base.
+- **Database**: Utilizes Drizzle ORM with PostgreSQL, ensuring efficient data handling and scalability.
+- **Emails**: Integrated email functionality with Nodemailer for reliable transactional email delivery.
+- **Styling**: Styled with Tailwind CSS for rapid UI development without sacrificing design quality.
 
-- Next 14
-- Lucia Auth Package
-- Postgre SQL
-- Drizzle ORM
-- Typescript
-- Tailwind CSS
-- Shadcn UI
+## Getting Started
 
-## Installation
+Follow these steps to get your SaaS project up and running on your local machine for development and testing purposes.
 
-install the package using npm or yarn
+### Prerequisites
 
-```bash
-npm install
-```
+- Node.js
+- PostgreSQL
+- A Stripe account
+- Google/Facebook/GitHub developer accounts for OAuth setup
 
-or
+### Installation
 
-```bash
-yarn
-```
 
-## Usage
+2. **Install dependencies**
 
-```bash
-npm run dev
-```
+   ```bash
+   npm install || yarn 
+   ```
 
-or
+3. **Environment setup**
 
-```bash
-yarn dev
-```
+   Copy the .env.exemple to .env update it with your credentials:
 
-or you can use Docker-compose
 
-```bash
-docker-compose up
-```
+4. **Database setup**
 
-It will start the server on http://localhost:3000 and create a local postgres database on port 5432
+   Run the migration scripts to set up your PostgreSQL database schemas:
 
-## Database
-You can create a local postgres database and add the credentials to the .env file
+   ```bash
+   npm run generate
+   ```
 
-```bash
-docker run --name postgres -e POSTGRES_PASSWORD=password -e POSTGRES_USER=username -e POSTGRES_DB=dbname -p 5432:5432 -d postgres
-```
+   ```bash
+   npm run push
+   ```
 
-```bash
-DATABASE_URL=postgres://username:password@localhost:5432/dbname
-```
+5. **Run the development server**
+
+   Start the server with:
+
+   ```bash
+   npm run dev
+   ```
+
+   Visit `http://localhost:3000` in your browser to see the application in action.
+
+## Deployment
+
+For deployment, ensure that you configure the production database and environment variables accordingly. More details about deployment can be found in the deployment section of the Next.js documentation.
+
+## Contributing
+
+We welcome contributions to this project! Please feel free to fork the repository, make your changes, and submit a pull request.
 
 ## License
 
-[MIT](https://choosealicense.com/licenses/mit/)
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

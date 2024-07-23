@@ -7,8 +7,6 @@ import { generateId } from "lucia";
 import { z } from "zod";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "@/lib/email";
-import { lucia, validateRequest } from "@/lib/lucia";
-import { cookies } from "next/headers";
 
 const generateMagicLink = async (email: string, userId: string) => {
   const token = jwt.sign({ email: email, userId }, process.env.JWT_SECRET!, {
