@@ -16,169 +16,137 @@ interface GoogleUser {
   locale: string;
 }
 
+async function validateRequest(
+  req: NextRequest
+): Promise<{ code: string; state: string } | null> {
+  const url = new URL(req.url);
+  const code = url.searchParams.get("code");
+  const state = url.searchParams.get("state");
+
+  if (!code || !state) {
+    return null;
+  }
+
+  const codeVerifier = cookies().get("codeVerifier")?.value;
+  const savedState = cookies().get("state")?.value;
+
+  if (!codeVerifier || !savedState || savedState !== state) {
+    return null;
+  }
+
+  return { code, state };
+}
+
+async function getGoogleUserData(accessToken: string): Promise<GoogleUser> {
+  const response = await fetch(
+    "https://www.googleapis.com/oauth2/v1/userinfo",
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      method: "GET",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch Google user data");
+  }
+
+  return response.json();
+}
+
+async function upsertUser(
+  trx: any,
+  userData: GoogleUser,
+  accessToken: string,
+  accessTokenExpiresAt: Date,
+  refreshToken: string | undefined
+) {
+  const existingUser = await trx.query.userTable.findFirst({
+    where: eq(userTable.id, userData.id),
+  });
+
+  if (!existingUser) {
+    await trx.insert(userTable).values({
+      email: userData.email,
+      id: userData.id,
+      name: userData.name,
+      profilePictureUrl: userData.picture,
+    });
+
+    await trx.insert(oauthAccountTable).values({
+      accessToken,
+      expiresAt: accessTokenExpiresAt,
+      id: userData.id,
+      provider: "google",
+      providerUserId: userData.id,
+      userId: userData.id,
+      refreshToken,
+    });
+  } else {
+    await trx
+      .update(oauthAccountTable)
+      .set({
+        accessToken,
+        expiresAt: accessTokenExpiresAt,
+        refreshToken,
+      })
+      .where(eq(oauthAccountTable.id, userData.id));
+  }
+}
+
+async function createSessionAndSetCookies(userId: string) {
+  const session = await lucia.createSession(userId, {
+    expiresIn: 60 * 60 * 24 * 30,
+  });
+  const sessionCookie = lucia.createSessionCookie(session.id);
+
+  cookies().set(
+    sessionCookie.name,
+    sessionCookie.value,
+    sessionCookie.attributes
+  );
+
+  cookies().set("state", "", { expires: new Date(0) });
+  cookies().set("codeVerifier", "", { expires: new Date(0) });
+}
+
 export const GET = async (req: NextRequest) => {
   try {
-    const url = new URL(req.url);
-    const searchParams = url.searchParams;
-
-    const code = searchParams.get("code");
-    const state = searchParams.get("state");
-
-    if (!code || !state) {
-      return Response.json(
-        { error: "Invalid request" },
-        {
-          status: 400,
-        }
-      );
+    const validatedRequest = await validateRequest(req);
+    if (!validatedRequest) {
+      return Response.json({ error: "Invalid request" }, { status: 400 });
     }
 
+    const { code, state } = validatedRequest;
     const codeVerifier = cookies().get("codeVerifier")?.value;
-    const savedState = cookies().get("state")?.value;
 
-    if (!codeVerifier || !savedState) {
-      return Response.json(
-        { error: "Code verifier or saved state is not exists" },
-        {
-          status: 400,
-        }
-      );
-    }
+    const { accessToken, accessTokenExpiresAt, refreshToken } =
+      await google.validateAuthorizationCode(code, codeVerifier!);
 
-    if (savedState !== state) {
-      return Response.json(
-        {
-          error: "State does not match",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
-    const { accessToken, idToken, accessTokenExpiresAt, refreshToken } =
-      await google.validateAuthorizationCode(code, codeVerifier);
-
-    const googleRes = await fetch(
-      "https://www.googleapis.com/oauth2/v1/userinfo",
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        method: "GET",
-      }
-    );
-
-    const googleData = (await googleRes.json()) as GoogleUser;
+    const googleData = await getGoogleUserData(accessToken);
 
     await db.transaction(async (trx) => {
-      const user = await trx.query.userTable.findFirst({
-        where: eq(userTable.id, googleData.id),
-      });
-
-      if (!user) {
-        const createdUserRes = await trx
-          .insert(userTable)
-          .values({
-            email: googleData.email,
-            id: googleData.id,
-            name: googleData.name,
-            profilePictureUrl: googleData.picture,
-          })
-          .returning({
-            id: userTable.id,
-          });
-
-        if (createdUserRes.length === 0) {
-          trx.rollback();
-          return Response.json(
-            { error: "Failed to create user" },
-            {
-              status: 500,
-            }
-          );
-        }
-
-        const createdOAuthAccountRes = await trx
-          .insert(oauthAccountTable)
-          .values({
-            accessToken,
-            expiresAt: accessTokenExpiresAt,
-            id: googleData.id,
-            provider: "google",
-            providerUserId: googleData.id,
-            userId: googleData.id,
-            refreshToken,
-          });
-
-        if (createdOAuthAccountRes.rowCount === 0) {
-          trx.rollback();
-          return Response.json(
-            { error: "Failed to create OAuthAccountRes" },
-            {
-              status: 500,
-            }
-          );
-        }
-      } else {
-        const updatedOAuthAccountRes = await trx
-          .update(oauthAccountTable)
-          .set({
-            accessToken,
-            expiresAt: accessTokenExpiresAt,
-            refreshToken,
-          })
-          .where(eq(oauthAccountTable.id, googleData.id));
-
-        if (updatedOAuthAccountRes.rowCount === 0) {
-          trx.rollback();
-          return Response.json(
-            { error: "Failed to update OAuthAccountRes" },
-            {
-              status: 500,
-            }
-          );
-        }
-      }
-
-      return NextResponse.redirect(
-        new URL("/dashboard", process.env.NEXT_PUBLIC_BASE_URL),
-        {
-          status: 302,
-        }
+      await upsertUser(
+        trx,
+        googleData,
+        accessToken,
+        accessTokenExpiresAt,
+        refreshToken
       );
     });
 
-    const session = await lucia.createSession(googleData.id, {
-      expiresIn: 60 * 60 * 24 * 30,
-    });
-    const sessionCookie = lucia.createSessionCookie(session.id);
-
-    cookies().set(
-      sessionCookie.name,
-      sessionCookie.value,
-      sessionCookie.attributes
-    );
-
-    cookies().set("state", "", {
-      expires: new Date(0),
-    });
-    cookies().set("codeVerifier", "", {
-      expires: new Date(0),
-    });
+    await createSessionAndSetCookies(googleData.id);
 
     return NextResponse.redirect(
       new URL("/dashboard", process.env.NEXT_PUBLIC_BASE_URL),
-      {
-        status: 302,
-      }
+      { status: 302 }
     );
   } catch (error: any) {
+    console.error("Error in Google OAuth callback:", error);
     return Response.json(
-      { error: error.message },
-      {
-        status: 500,
-      }
+      { error: "An unexpected error occurred" },
+      { status: 500 }
     );
   }
 };

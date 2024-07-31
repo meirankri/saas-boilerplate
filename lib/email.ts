@@ -20,9 +20,9 @@ export async function sendEmail({
   html: string;
 }) {
   await transporter.sendMail({
-    from: `"your name" <${process.env.EMAIL_SERVER_USER}>`, // sender address
-    to, // list of receivers
-    subject, // Subject line
-    html, // html body
+    from: `"your name" <${process.env.EMAIL_SERVER_USER}>`,
+    to,
+    subject,
+    html,
   });
 }
