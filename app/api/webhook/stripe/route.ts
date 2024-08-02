@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import Stripe from "stripe";
 import { eq } from "drizzle-orm";
-import db from "@/lib/database";
+import { db } from "@/lib/database/adapter/db";
 import { subscriptionTable, userTable } from "@/lib/database/schema";
 import { generateId } from "lucia";
 import { pricingPlanByPriceId } from "@/app/constants/stripe";
@@ -87,11 +87,11 @@ async function updateOrCreateUser(
   priceId: string,
   planTitle: string
 ) {
-  const [existingUser] = await db
-    .select()
-    .from(userTable)
-    .where(eq(userTable.email, email))
-    .limit(1);
+  const existingUser = await db.users.findUnique({
+    where: {
+      email,
+    },
+  });
 
   if (isEmpty(existingUser)) {
     const userId = generateId(15);
@@ -108,16 +108,20 @@ async function createNewUser(
   priceId: string,
   planTitle: string
 ) {
-  await db.insert(userTable).values({
-    id: userId,
-    email,
-    stripeCustomerId: customerId,
-    priceId,
+  await db.users.create({
+    data: {
+      id: userId,
+      email,
+      stripeCustomerId: customerId,
+      priceId,
+    },
   });
 
-  await db.insert(subscriptionTable).values({
-    userId,
-    subscriptionPlan: planTitle,
+  await db.subscriptions.create({
+    data: {
+      userId,
+      subscriptionPlan: planTitle,
+    },
   });
 }
 
@@ -127,33 +131,42 @@ async function updateExistingUser(
   priceId: string,
   planTitle: string
 ) {
-  await db
-    .update(userTable)
-    .set({
+  await db.users.update({
+    where: {
+      id: userId,
+    },
+    data: {
       stripeCustomerId: customerId,
       priceId,
-    })
-    .where(eq(userTable.id, userId));
+    },
+  });
 
-  await db
-    .insert(subscriptionTable)
-    .values({ userId, subscriptionPlan: planTitle })
-    .onConflictDoUpdate({
-      target: subscriptionTable.userId,
-      set: { subscriptionPlan: planTitle },
-    });
+  await db.subscriptions.upsert({
+    where: {
+      userId,
+    },
+    create: {
+      userId,
+      subscriptionPlan: planTitle,
+    },
+    update: {
+      subscriptionPlan: planTitle,
+    },
+  });
 }
 
 async function handleCustomerSubscriptionDeleted(
   subscription: Stripe.Subscription
 ) {
-  const [existingUser] = await db
-    .select()
-    .from(userTable)
-    .where(eq(userTable.stripeCustomerId, subscription.customer as string))
-    .limit(1);
+  const existingUser = await db.users.findUnique({
+    where: {
+      stripeCustomerId: subscription.customer as string,
+    },
+  });
 
-  await db
-    .delete(subscriptionTable)
-    .where(eq(subscriptionTable.userId, existingUser.id));
+  await db.subscriptions.delete({
+    where: {
+      userId: existingUser.id,
+    },
+  });
 }

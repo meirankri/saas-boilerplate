@@ -1,5 +1,5 @@
 import { Lucia } from "lucia";
-import adapter from "./adapter";
+import adapter from "./prismaAdapter";
 import { cookies } from "next/headers";
 import { cache } from "react";
 import { ExtendedUser } from "@/types";
@@ -7,7 +7,6 @@ import { ExtendedUser } from "@/types";
 export const lucia = new Lucia(adapter, {
   sessionCookie: {
     attributes: {
-      // set to `true` when using HTTPS
       secure: process.env.NODE_ENV === "production",
     },
   },
@@ -45,7 +44,9 @@ export const validateRequest = cache(async () => {
         sessionCookie.attributes
       );
     }
-  } catch {}
+  } catch (e) {
+    console.log("Error setting session cookie", e);
+  }
   return {
     user: extendedUser,
     session,

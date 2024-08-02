@@ -1,10 +1,9 @@
 import { NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
-import db from "@/lib/database";
-import { eq } from "drizzle-orm";
-import { magicLinkTable } from "@/lib/database/schema";
+import { db } from "@/lib/database/adapter/db";
 import { lucia } from "@/lib/lucia";
 import { cookies } from "next/headers";
+
 export const GET = async (req: NextRequest) => {
   try {
     const url = new URL(req.url);
@@ -28,8 +27,10 @@ export const GET = async (req: NextRequest) => {
       email: string;
       userId: string;
     };
-    const existedToken = await db.query.magicLinkTable.findFirst({
-      where: eq(magicLinkTable.userId, decoded.userId),
+    const existedToken = await db.magicLink.select({
+      where: {
+        userId: decoded.userId,
+      },
     });
 
     if (!existedToken) {
@@ -42,9 +43,14 @@ export const GET = async (req: NextRequest) => {
         }
       );
     } else {
-      await db
-        .delete(magicLinkTable)
-        .where(eq(magicLinkTable.userId, decoded.userId));
+      await db.magicLink.delete({
+        where: {
+          userId_token: {
+            userId: decoded.userId,
+            token,
+          },
+        },
+      });
     }
 
     const session = await lucia.createSession(decoded.userId, {

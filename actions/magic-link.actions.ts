@@ -1,8 +1,6 @@
 "use server";
-import db from "@/lib/database";
-import { magicLinkTable, userTable } from "@/lib/database/schema";
+import { db } from "@/lib/database/adapter/db";
 import { SignInSchema } from "@/types";
-import { eq } from "drizzle-orm";
 import { generateId } from "lucia";
 import { z } from "zod";
 import jwt from "jsonwebtoken";
@@ -29,36 +27,43 @@ export const signIn = async (values: z.infer<typeof SignInSchema>) => {
   try {
     SignInSchema.parse(values);
 
-    const existedUser = await db.query.userTable.findFirst({
-      where: eq(userTable.email, values.email),
+    const existedUser = await db.users.findUnique({
+      where: { email: values.email },
     });
 
     if (existedUser) {
       const res = await generateMagicLink(values.email, existedUser.id);
 
-      await db.insert(magicLinkTable).values({
-        userId: existedUser.id,
-        token: res.data.token,
+      await db.magicLink.create({
+        data: {
+          userId: existedUser.id,
+          token: res.data.token,
+        },
       });
       await sendEmail({
         to: values.email,
         subject: "signup link",
         html: `<div>click to sign up ${res.data.url}</div>`,
       });
-      console.log(res.data);
     } else {
       // we will create the user
       const userId = generateId(15);
-      await db.insert(userTable).values({
-        email: values.email,
-        id: userId,
+
+      await db.users.create({
+        data: {
+          email: values.email,
+          id: userId,
+        },
       });
       const res = await generateMagicLink(values.email, userId);
 
-      await db.insert(magicLinkTable).values({
-        userId,
-        token: res.data.token,
+      await db.magicLink.create({
+        data: {
+          userId,
+          token: res.data.token,
+        },
       });
+
       await sendEmail({
         to: values.email,
         subject: "signup link",

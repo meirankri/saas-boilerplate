@@ -1,4 +1,4 @@
-import db from "@/lib/database";
+import { db } from "@/lib/database/adapter/db";
 import { oauthAccountTable, userTable } from "@/lib/database/schema";
 import { lucia } from "@/lib/lucia";
 import { github } from "@/lib/lucia/oauth";
@@ -57,81 +57,7 @@ export const GET = async (req: NextRequest) => {
 
     const githubData = (await githubRes.json()) as any;
 
-    console.log("githubData", githubData);
-
-    await db.transaction(async (trx) => {
-      const user = await trx.query.userTable.findFirst({
-        where: eq(userTable.id, githubData.id),
-      });
-      if (!user) {
-        const createdUserRes = await trx
-          .insert(userTable)
-          .values({
-            email: githubData.email,
-            id: githubData.id,
-            name: githubData.name,
-            profilePictureUrl: githubData.avatar_url,
-          })
-          .returning({
-            id: userTable.id,
-          });
-
-        if (createdUserRes.length === 0) {
-          trx.rollback();
-          return Response.json(
-            { error: "Failed to create user" },
-            {
-              status: 500,
-            }
-          );
-        }
-        const date = new Date();
-        const createdOAuthAccountRes = await trx
-          .insert(oauthAccountTable)
-          .values({
-            accessToken,
-            id: generateId(15),
-            provider: "github",
-            providerUserId: githubData.id,
-            userId: githubData.id,
-            expiresAt: new Date(date.setSeconds(date.getSeconds() + 3600)),
-          });
-
-        if (createdOAuthAccountRes.rowCount === 0) {
-          trx.rollback();
-          return Response.json(
-            { error: "Failed to create OAuthAccountRes" },
-            {
-              status: 500,
-            }
-          );
-        }
-      } else {
-        const updatedOAuthAccountRes = await trx
-          .update(oauthAccountTable)
-          .set({
-            accessToken,
-          })
-          .where(eq(oauthAccountTable.id, githubData.id));
-
-        if (updatedOAuthAccountRes.rowCount === 0) {
-          trx.rollback();
-          return Response.json(
-            { error: "Failed to update OAuthAccountRes" },
-            {
-              status: 500,
-            }
-          );
-        }
-      }
-
-      return NextResponse.redirect(
-        new URL("/dashboard", process.env.NEXT_PUBLIC_BASE_URL),
-        {
-          status: 302,
-        }
-      );
-    });
+    await handleGitHubAuth(githubData, accessToken);
 
     const session = await lucia.createSession(githubData.id, {
       expiresIn: 60 * 60 * 24 * 30,
@@ -149,7 +75,7 @@ export const GET = async (req: NextRequest) => {
     });
 
     return NextResponse.redirect(
-      new URL("/", process.env.NEXT_PUBLIC_BASE_URL),
+      new URL("/dashboard", process.env.NEXT_PUBLIC_BASE_URL),
       {
         status: 302,
       }
@@ -163,3 +89,66 @@ export const GET = async (req: NextRequest) => {
     );
   }
 };
+
+type GitHubData = {
+  id: string;
+  email: string;
+  name: string;
+  avatar_url: string;
+};
+
+async function handleGitHubAuth(githubData: GitHubData, accessToken: string) {
+  try {
+    await db.transaction(async (trx) => {
+      const user = await trx.user.findFirst({
+        where: { id: githubData.id },
+      });
+
+      if (!user) {
+        const createdUser = await trx.user.create({
+          data: {
+            email: githubData.email,
+            id: githubData.id,
+            name: githubData.name,
+            profilePictureUrl: githubData.avatar_url,
+          },
+          select: { id: true },
+        });
+
+        if (!createdUser) {
+          throw new Error("Failed to create user");
+        }
+
+        const expiresAt = new Date(Date.now() + 3600 * 1000); // 1 hour from now
+
+        const createdOAuthAccount = await trx.oauthAccount.create({
+          data: {
+            accessToken,
+            id: generateId(15), // Assuming you have this function
+            provider: "github",
+            providerUserId: githubData.id,
+            userId: githubData.id,
+            expiresAt,
+          },
+        });
+
+        if (!createdOAuthAccount) {
+          throw new Error("Failed to create OAuthAccount");
+        }
+      } else {
+        const updatedOAuthAccount = await trx.oauthAccount.update({
+          where: { id: githubData.id },
+          data: { accessToken },
+        });
+
+        if (!updatedOAuthAccount) {
+          throw new Error("Failed to update OAuthAccount");
+        }
+      }
+
+      return true; // Successful transaction
+    });
+  } catch (error) {
+    console.error("Transaction failed:", error);
+  }
+}

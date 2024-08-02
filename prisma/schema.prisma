@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String         @id @default(uuid())
+  email             String         @unique
+  isEmailVerified   Boolean        @default(false)
+  profilePictureUrl String?
+  stripeCustomerId  String?        @unique
+  priceId           String?
+  name              String?
+  subscription      Subscription?
+  oauthAccounts     OauthAccount[]
+  magicLinks        MagicLink[]
+  sessions          Session[]
+}
+
+model Subscription {
+  id               Int    @id @default(autoincrement())
+  userId           String @unique
+  subscriptionPlan String
+  user             User   @relation(fields: [userId], references: [id])
+}
+
+model OauthAccount {
+  id             String   @id @default(uuid())
+  userId         String
+  provider       String
+  providerUserId String
+  accessToken    String
+  refreshToken   String?
+  expiresAt      DateTime
+  user           User     @relation(fields: [userId], references: [id])
+}
+
+model MagicLink {
+  id     Int    @id @default(autoincrement())
+  userId String
+  token  String
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([userId, token])
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  expiresAt DateTime
+  expiresIn Int
+
+  user User @relation(references: [id], fields: [userId], onDelete: Cascade)
+}

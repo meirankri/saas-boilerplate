@@ -1,4 +1,4 @@
-import db from "@/lib/database";
+import { db } from "@/lib/database/adapter/db";
 import { oauthAccountTable, userTable } from "@/lib/database/schema";
 import { lucia } from "@/lib/lucia";
 import { facebook } from "@/lib/lucia/oauth";
@@ -47,27 +47,32 @@ export const GET = async (req: NextRequest) => {
 
     const transactionRes = await db.transaction(async (trx) => {
       try {
-        const existingUser = await trx.query.userTable.findFirst({
-          where: (table) => eq(table.email, facebookData.email),
+        const existingUser = await trx.user.findFirst({
+          where: { email: facebookData.email },
         });
 
         if (!existingUser) {
           const userId = generateId(15);
-          await trx.insert(userTable).values({
-            id: userId,
-            email: facebookData.email,
-            name: facebookData.name,
-            profilePictureUrl: facebookData.picture.url,
-            isEmailVerified: true,
+          await trx.user.create({
+            data: {
+              email: facebookData.email,
+              id: facebookData.id,
+              name: facebookData.name,
+              profilePictureUrl: facebookData.picture.url,
+              isEmailVerified: true,
+            },
+            select: { id: true },
           });
 
-          await trx.insert(oauthAccountTable).values({
-            accessToken,
-            expiresAt: accessTokenExpiresAt,
-            provider: "facebook",
-            providerUserId: facebookData.id,
-            userId,
-            id: generateId(15),
+          await trx.oauthAccount.create({
+            data: {
+              accessToken,
+              id: generateId(15), // Assuming you have this function
+              provider: "facebook",
+              providerUserId: facebookData.id,
+              userId,
+              expiresAt: accessTokenExpiresAt,
+            },
           });
 
           return {
@@ -78,18 +83,14 @@ export const GET = async (req: NextRequest) => {
             },
           };
         } else {
-          await trx
-            .update(oauthAccountTable)
-            .set({
-              accessToken,
-              expiresAt: accessTokenExpiresAt,
-            })
-            .where(
-              and(
-                eq(oauthAccountTable.providerUserId, facebookData.id),
-                eq(oauthAccountTable.provider, "facebook")
-              )
-            );
+          const updatedOAuthAccount = await trx.oauthAccount.update({
+            where: { id: facebookData.id, provider: "facebook" },
+            data: { accessToken, expiresAt: accessTokenExpiresAt },
+          });
+
+          if (!updatedOAuthAccount) {
+            throw new Error("Failed to update OAuthAccount");
+          }
         }
 
         return {

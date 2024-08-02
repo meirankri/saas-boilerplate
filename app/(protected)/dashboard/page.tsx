@@ -10,6 +10,10 @@ export default async function Home() {
         <div className="bg-red-500 p-4">This is a premium content</div>
       </HasAuthorizationServer>
 
+      <HasAuthorizationServer plans={["Basic plus"]}>
+        <div className="bg-red-500 p-4">This is a basic plus content</div>
+      </HasAuthorizationServer>
+
       <IsForbidenServer plans={["Premium"]}>
         <div className="bg-red-500 p-4">your have not the premium plan</div>
       </IsForbidenServer>
