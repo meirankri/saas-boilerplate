@@ -6,7 +6,7 @@ Welcome to our SaaS Boilerplate Project, an all-in-one starter kit designed to j
 
 - **Authentication**: Seamless authentication setup using Lucia-auth with support for Magic Link, Google, Facebook, and GitHub sign-ins.
 - **Payments**: Integrated with Stripe for handling subscription-based models. Multiple subscription plans are supported to cater to a diverse customer base.
-- **Database**: Utilizes Drizzle ORM with PostgreSQL, ensuring efficient data handling and scalability.
+- **Database**: Utilizes prisma ORM with PostgreSQL, ensuring efficient data handling and scalability.
 - **Emails**: Integrated email functionality with Nodemailer for reliable transactional email delivery.
 - **Styling**: Styled with Tailwind CSS for rapid UI development without sacrificing design quality.
 
@@ -41,10 +41,6 @@ Follow these steps to get your SaaS project up and running on your local machine
 
    ```bash
    npm run generate
-   ```
-
-   ```bash
-   npm run push
    ```
 
 5. **Run the development server**
