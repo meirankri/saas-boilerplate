@@ -1,5 +1,5 @@
 "use server";
-import { db } from "@/lib/database/adapter/db";
+import { db } from "@/lib/database/db";
 import { SignInSchema } from "@/types";
 import { generateId } from "lucia";
 import { z } from "zod";

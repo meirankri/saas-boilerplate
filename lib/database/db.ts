@@ -3,7 +3,6 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const db = {
-  // Utilisateurs
   users: {
     findMany: (args?: Parameters<typeof prisma.user.findMany>[0]) =>
       prisma.user.findMany(args),
@@ -19,7 +18,6 @@ export const db = {
       prisma.user.upsert(args),
   },
 
-  // Abonnements
   subscriptions: {
     findMany: (args?: Parameters<typeof prisma.subscription.findMany>[0]) =>
       prisma.subscription.findMany(args),
@@ -85,8 +83,6 @@ export const db = {
   ) => {
     return prisma.$transaction(fn);
   },
-  // Ajoutez d'autres modèles de la même manière...
 
-  // Fonction pour fermer la connexion à la base de données
   disconnect: () => prisma.$disconnect(),
 };

@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import Stripe from "stripe";
-import { eq } from "drizzle-orm";
-import { db } from "@/lib/database/adapter/db";
-import { subscriptionTable, userTable } from "@/lib/database/schema";
+import { db } from "@/lib/database/db";
 import { generateId } from "lucia";
 import { pricingPlanByPriceId } from "@/app/constants/stripe";
 import { isEmpty } from "@/lib/utils";

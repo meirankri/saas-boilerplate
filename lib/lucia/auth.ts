@@ -1,4 +1,4 @@
-import { db } from "@/lib/database/adapter/db";
+import { db } from "@/lib/database/db";
 import { getCurrentUser } from ".";
 import { GoogleUser } from "@/types";
 

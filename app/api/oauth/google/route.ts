@@ -1,4 +1,4 @@
-import { db } from "@/lib/database/adapter/db";
+import { db } from "@/lib/database/db";
 import { lucia } from "@/lib/lucia";
 import { oauthUpsertUser } from "@/lib/lucia/auth";
 import { google } from "@/lib/lucia/oauth";

@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
-import { db } from "@/lib/database/adapter/db";
+import { db } from "@/lib/database/db";
 import { lucia } from "@/lib/lucia";
 import { cookies } from "next/headers";
 

@@ -6,8 +6,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "generate": "drizzle-kit generate:pg",
-    "push": "drizzle-kit push:pg"
+    "generate": "prisma migrate dev --name"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.6.0",

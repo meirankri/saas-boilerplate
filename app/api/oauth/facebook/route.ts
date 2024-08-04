@@ -1,8 +1,6 @@
-import { db } from "@/lib/database/adapter/db";
-import { oauthAccountTable, userTable } from "@/lib/database/schema";
+import { db } from "@/lib/database/db";
 import { lucia } from "@/lib/lucia";
 import { facebook } from "@/lib/lucia/oauth";
-import { and, eq } from "drizzle-orm";
 import { generateId } from "lucia";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
