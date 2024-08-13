@@ -30,11 +30,9 @@ export async function POST(req: Request) {
     );
 
     switch (event.type) {
-      case "checkout.session.completed":
       case "customer.subscription.updated":
-        await handleCheckoutSessionCompleted(
-          event.data.object as Stripe.Checkout.Session
-        );
+      case "customer.subscription.created":
+        await handleCheckoutSessionCompleted(event.data.object);
         break;
       case "customer.subscription.deleted":
         await handleCustomerSubscriptionDeleted(
@@ -51,22 +49,15 @@ export async function POST(req: Request) {
   }
 }
 
-async function handleCheckoutSessionCompleted(
-  session: Stripe.Checkout.Session
-) {
+async function handleCheckoutSessionCompleted(session: Stripe.Subscription) {
   const customerId = session.customer as string;
   const customer = await stripe.customers.retrieve(customerId);
-
+  const priceId = session.items?.data[0]?.price?.id;
   if (customer.deleted) {
     console.error("Customer has been deleted");
     return;
   }
 
-  const expandedSession = await stripe.checkout.sessions.retrieve(session.id, {
-    expand: ["line_items"],
-  });
-
-  const priceId = expandedSession.line_items?.data[0]?.price?.id;
   if (!priceId) {
     console.error("No price ID found in session");
     return;
