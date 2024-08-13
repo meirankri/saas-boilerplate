@@ -1,4 +1,7 @@
-import { getCurrentUser } from "@/lib/lucia";
+import Image from "next/image";
+import { getTranslations, getLocale } from "next-intl/server";
+
+import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import {
   Disclosure,
   DisclosureButton,
@@ -8,18 +11,20 @@ import {
   MenuItem,
   MenuItems,
 } from "@headlessui/react";
-import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import Image from "next/image";
+
+import { Link, Locale } from "@/i18n.config";
+import { getCurrentUser } from "@/lib/lucia";
 import { signOut } from "@/actions/auth.actions";
 import { signInNavigation, signUpNavigation } from "@/app/constants/navigation";
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
+import LocaleSwitcher from "./LanguageSwitcher";
+import { classNames } from "@/utils/style";
 
 export const Header = async () => {
   const user = await getCurrentUser();
   const navigation = user ? signUpNavigation : signInNavigation;
+  const t = await getTranslations("Header");
+  const locale = (await getLocale()) as Locale;
+
   return (
     <Disclosure as="nav" className="bg-gray-800">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -40,21 +45,23 @@ export const Header = async () => {
           </div>
           <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
             <div className="flex flex-shrink-0 items-center">
-              <Image
+              {/* <Image
                 alt="Your Company"
                 width={32}
                 height={32}
                 src="/next.svg"
                 className="h-8 w-auto"
-              />
+              /> */}
+              <span className="text-white text-lg font-bold ml-2">
+                {t("appTitle")}
+              </span>
             </div>
             <div className="hidden sm:ml-6 sm:block">
               <div className="flex space-x-4">
                 {navigation.map((item) => (
-                  <a
+                  <Link
                     key={item.name}
                     href={item.href}
-                    aria-current={item.current ? "page" : undefined}
                     className={classNames(
                       item.current
                         ? "bg-gray-900 text-white"
@@ -63,8 +70,9 @@ export const Header = async () => {
                     )}
                   >
                     {item.name}
-                  </a>
+                  </Link>
                 ))}
+                <LocaleSwitcher locale={locale} />
               </div>
             </div>
           </div>
@@ -149,6 +157,7 @@ export const Header = async () => {
               {item.name}
             </DisclosureButton>
           ))}
+          <LocaleSwitcher locale={locale} />
         </div>
       </DisclosurePanel>
     </Disclosure>

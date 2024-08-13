@@ -16,10 +16,11 @@ export async function GET(request: Request) {
     const quotaInfo = await quotaService.getQuotaInfo(userId, productName);
 
     if (!quotaInfo) {
-      return NextResponse.json(
-        { error: "No quota information found" },
-        { status: 404 }
-      );
+      return NextResponse.json({
+        remaining: 0,
+        total: 0,
+        productName: productName,
+      });
     }
 
     return NextResponse.json({

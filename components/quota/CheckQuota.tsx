@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
+import { useTranslations } from "next-intl";
+
 import { useSession } from "@/providers/SessionProvider";
 import { useQuota } from "@/providers/QuotaProvider";
 
@@ -17,7 +19,7 @@ export function QuotaCheck({
 }: QuotaCheckProps) {
   const session = useSession();
   const userId = session?.id ?? null;
-
+  const t = useTranslations();
   const { quotaInfo, isLoading, error, canUseProduct } = useQuota(
     userId,
     productName
@@ -27,20 +29,32 @@ export function QuotaCheck({
     return fallback ? (
       <>{fallback}</>
     ) : (
-      <div>Veuillez vous connecter pour vérifier les quotas.</div>
+      <div>{t("QuotaCheck.connexionError")}</div>
     );
   }
 
   if (isLoading) {
-    return <div>Vérification des quotas...</div>;
+    return <div>{t("QuotaCheck.checking")}</div>;
+  }
+
+  if (quotaInfo?.total === 0) {
+    return (
+      <div>
+        <p>{t("QuotaCheck.noAccess", { productName })}</p>
+      </div>
+    );
   }
 
   if (error) {
-    return <div>Erreur lors de la vérification des quotas: {error}</div>;
+    return (
+      <div>
+        <p>{t("QuotaCheck.error", { error })}</p>
+      </div>
+    );
   }
 
   if (!quotaInfo) {
-    return <div>Aucune information de quota disponible pour {productName}</div>;
+    return <div>{t("QuotaCheck.noInformation", { productName })}</div>;
   }
 
   if (!canUseProduct) {
@@ -48,7 +62,7 @@ export function QuotaCheck({
       <>{fallback}</>
     ) : (
       <div>
-        <p>Quota épuisé pour {productName}.</p>
+        <p> {t("QuotaCheck.exceeded", { productName })} </p>
       </div>
     );
   }

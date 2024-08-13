@@ -1,0 +1,13 @@
+{
+    "Header": {
+        "appTitle": "Meilleur SaaS Boilerplate"
+    },
+    "QuotaCheck": {
+        "exceeded": "Quota dépassé pour {productName}",
+        "connexionError": "Veuillez vous connecter pour vérifier les quotas.",
+        "checking": "Vérification du quota...",
+        "error": "Erreur de vérification du quota {error}",
+        "noInformation": "Aucune information de quota disponible pour {productName}",
+        "noAccess": "Vous n'avez pas access à {productName}."
+    }
+}

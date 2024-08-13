@@ -9,6 +9,7 @@ Welcome to our SaaS Boilerplate Project, an all-in-one starter kit designed to j
 - **Database**: Utilizes prisma ORM with PostgreSQL, ensuring efficient data handling and scalability.
 - **Emails**: Integrated email functionality with Nodemailer for reliable transactional email delivery.
 - **Styling**: Styled with Tailwind CSS for rapid UI development without sacrificing design quality.
+- **Multilingual Support**: Seamless multilingual setup with i18n to efficiently manage and support multiple languages.
 
 ## Getting Started
 
