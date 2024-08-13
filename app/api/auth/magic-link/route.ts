@@ -27,7 +27,7 @@ export const GET = async (req: NextRequest) => {
       email: string;
       userId: string;
     };
-    const existedToken = await db.magicLink.select({
+    const existedToken = await db.magicLink.findFirst({
       where: {
         userId: decoded.userId,
       },

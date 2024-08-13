@@ -27,7 +27,7 @@ export const signIn = async (values: z.infer<typeof SignInSchema>) => {
   try {
     SignInSchema.parse(values);
 
-    const existedUser = await db.users.findUnique({
+    const existedUser = await db.user.findUnique({
       where: { email: values.email },
     });
 
@@ -49,7 +49,7 @@ export const signIn = async (values: z.infer<typeof SignInSchema>) => {
       // we will create the user
       const userId = generateId(15);
 
-      await db.users.create({
+      await db.user.create({
         data: {
           email: values.email,
           id: userId,

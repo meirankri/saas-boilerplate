@@ -23,6 +23,12 @@ Follow these steps to get your SaaS project up and running on your local machine
 
 ### Installation
 
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/meirankri/saas-boilerplate.git
+   cd your-project
+   ``
 
 2. **Install dependencies**
 
@@ -52,6 +58,49 @@ Follow these steps to get your SaaS project up and running on your local machine
    ```
 
    Visit `http://localhost:3000` in your browser to see the application in action.
+
+
+## Managing Payments
+
+To manage payments, follow these steps:
+
+1. **Create Products on Stripe**
+
+   First, you need to create your products on Stripe. Each product should have a price and a payment link (`priceId`).
+
+2. **Add Payment Links and Price IDs**
+
+   After creating the products on Stripe, add the payment links and `priceId` to the `pricingList` constant in `app/constants/stripe.ts`. Each plan should have a title, features, and associated products.
+
+   Example structure for `pricingList`:
+
+   ```typescript
+   export const pricingList = {
+     basic: [
+       {
+         planTitle: "Basic Plan",
+         price: 10,
+         timeline: "monthly",
+         link: "https://buy.stripe.com/test_basic_plan",
+         priceId: "price_1Hh1Y2E2eZvKYlo2C1",
+         description: "Basic plan description",
+         features: [
+           { isActive: true, label: "Build Links" },
+           { isActive: true, label: "Over 66 complex" },
+           { isActive: false, label: "24/7 Contact support" },
+           { isActive: false, label: "Build Tools easily" },
+           { isActive: false, label: "6TB storage" },
+         ],
+         products: [
+           { name: "Product 1", quota:10 },
+           { name: "Product 2" , quota: 20},
+         ],
+       },
+     ],
+     // Add more plans as needed
+   };
+
+3. run yarn seed to populate the database
 
 ## Deployment
 

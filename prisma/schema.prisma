@@ -15,17 +15,59 @@ model User {
   stripeCustomerId  String?        @unique
   priceId           String?
   name              String?
-  subscription      Subscription?
+  subscription      Subscription?  @relation(fields: [subscriptionId], references: [id])
   oauthAccounts     OauthAccount[]
   magicLinks        MagicLink[]
   sessions          Session[]
+
+  ProductUsage   ProductUsage[]
+  subscriptionId String?
+}
+
+model Product {
+  id             String         @id @default(uuid())
+  name           String
+  quota          Int
+  subscriptionId String
+  subscription   Subscription   @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  ProductUsage   ProductUsage[]
+
+  @@unique([name, subscriptionId])
+}
+
+model ProductUsage {
+  id        String  @id @default(uuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  remaining Int
+
+  @@unique([userId, productId])
 }
 
 model Subscription {
-  id               Int    @id @default(autoincrement())
-  userId           String @unique
-  subscriptionPlan String
-  user             User   @relation(fields: [userId], references: [id])
+  id            String    @id @default(uuid())
+  planTitle     String
+  price         Decimal
+  timeline      String
+  description   String
+  stripePriceId String?
+  stripeLink    String?
+  features      Feature[]
+  products      Product[]
+  User          User[]
+
+  @@unique([planTitle, timeline])
+}
+
+model Feature {
+  id             String       @id @default(uuid())
+  label          String
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@unique([label, subscriptionId])
 }
 
 model OauthAccount {

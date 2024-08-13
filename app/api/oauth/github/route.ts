@@ -97,7 +97,7 @@ type GitHubData = {
 
 async function handleGitHubAuth(githubData: GitHubData, accessToken: string) {
   try {
-    await db.transaction(async (trx) => {
+    await db.$transaction(async (trx) => {
       const user = await trx.user.findFirst({
         where: { id: githubData.id },
       });

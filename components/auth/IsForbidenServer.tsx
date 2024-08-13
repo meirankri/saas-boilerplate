@@ -12,7 +12,7 @@ export default async function IsForbidenServer({
 }: IsForbidenServerProps) {
   const { subscription } = await getAuthStatus();
 
-  if (plans.includes(subscription?.subscriptionPlan)) {
+  if (plans.includes(subscription?.planTitle)) {
     return;
   }
 

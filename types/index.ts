@@ -29,3 +29,33 @@ export interface GoogleUser {
   picture: string;
   locale: string;
 }
+
+export interface QuotaInfo {
+  remaining: number;
+  total: number;
+  productName: string;
+}
+export interface UseQuotaResult {
+  userId: string | null;
+  productName: string | null;
+  quotaInfo: QuotaInfo | null;
+  isLoading: boolean;
+  error: string | null;
+  canUseProduct: boolean;
+  remaining: number;
+  fetchQuotaInfo: () => Promise<void>;
+  decrementQuota: (amount?: number) => Promise<void>;
+  resetQuota: () => Promise<void>;
+}
+
+export type PricingPlan = {
+  planTitle: string;
+  price: number;
+  timeline: string;
+  link: string;
+  priceId: string;
+  description: string;
+  features: {
+    label: string;
+  }[];
+};

@@ -16,7 +16,7 @@ export default async function HasAuthorizationServer({
     return;
   }
 
-  if (!plans.includes(subscription?.subscriptionPlan)) {
+  if (!plans.includes(subscription?.planTitle)) {
     return;
   }
 

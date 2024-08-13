@@ -13,7 +13,7 @@ export default function useAuthAndSubscription() {
         if (res.ok) {
           const data = await res.json();
           setUser(data.user);
-          setSubscription(data.subscription.subscriptionPlan);
+          setSubscription(data.subscription);
         }
       } catch (error) {
         console.error("error during the verification:", error);

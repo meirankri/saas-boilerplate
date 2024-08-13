@@ -43,7 +43,7 @@ export const GET = async (req: NextRequest) => {
       };
     };
 
-    const transactionRes = await db.transaction(async (trx) => {
+    const transactionRes = await db.$transaction(async (trx) => {
       try {
         const existingUser = await trx.user.findFirst({
           where: { email: facebookData.email },

@@ -79,7 +79,7 @@ export const GET = async (req: NextRequest) => {
     const googleData = await getGoogleUserData(accessToken);
 
     try {
-      await db.transaction((trx) => {
+      await db.$transaction((trx) => {
         return oauthUpsertUser(
           googleData,
           accessToken,

@@ -5,6 +5,8 @@ import { db } from "@/lib/database/db";
 import { generateId } from "lucia";
 import { pricingPlanByPriceId } from "@/app/constants/stripe";
 import { isEmpty } from "@/lib/utils";
+import { PricingPlan } from "@/types";
+import { SubscriptionWithProducts } from "@/types/user";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
@@ -29,6 +31,7 @@ export async function POST(req: Request) {
 
     switch (event.type) {
       case "checkout.session.completed":
+      case "customer.subscription.updated":
         await handleCheckoutSessionCompleted(
           event.data.object as Stripe.Checkout.Session
         );
@@ -69,10 +72,11 @@ async function handleCheckoutSessionCompleted(
     return;
   }
 
-  const planTitle = pricingPlanByPriceId(priceId);
+  const plan = pricingPlanByPriceId(priceId);
+
   if (customer.deleted !== true) {
     if (typeof customer === "object" && customer.email) {
-      await updateOrCreateUser(customer.email, customerId, priceId, planTitle);
+      await updateOrCreateUser(customer.email, customerId, priceId, plan);
     } else {
       console.error("Invalid customer data");
     }
@@ -83,9 +87,9 @@ async function updateOrCreateUser(
   email: string,
   customerId: string,
   priceId: string,
-  planTitle: string
+  plan: PricingPlan
 ) {
-  const existingUser = await db.users.findUnique({
+  const existingUser = await db.user.findUnique({
     where: {
       email,
     },
@@ -93,9 +97,9 @@ async function updateOrCreateUser(
 
   if (isEmpty(existingUser)) {
     const userId = generateId(15);
-    await createNewUser(userId, email, customerId, priceId, planTitle);
+    await createNewUser(userId, email, customerId, priceId, plan);
   } else {
-    await updateExistingUser(existingUser.id, customerId, priceId, planTitle);
+    await updateExistingUser(existingUser.id, customerId, priceId, plan);
   }
 }
 
@@ -104,22 +108,32 @@ async function createNewUser(
   email: string,
   customerId: string,
   priceId: string,
-  planTitle: string
-) {
-  await db.users.create({
-    data: {
-      id: userId,
-      email,
-      stripeCustomerId: customerId,
-      priceId,
-    },
-  });
+  plan: PricingPlan
+): Promise<void> {
+  await db.$transaction(async (trx) => {
+    const subscription: SubscriptionWithProducts =
+      await trx.subscription.findFirst({
+        where: { planTitle: plan.planTitle, timeline: plan.timeline },
+        include: { products: true },
+      });
 
-  await db.subscriptions.create({
-    data: {
-      userId,
-      subscriptionPlan: planTitle,
-    },
+    await trx.user.create({
+      data: {
+        id: userId,
+        email,
+        stripeCustomerId: customerId,
+        priceId,
+        subscription: {
+          connect: { id: subscription.id },
+        },
+        ProductUsage: {
+          create: subscription.products.map((product) => ({
+            product: { connect: { id: product.id } },
+            remaining: product.quota,
+          })),
+        },
+      },
+    });
   });
 }
 
@@ -127,44 +141,54 @@ async function updateExistingUser(
   userId: string,
   customerId: string,
   priceId: string,
-  planTitle: string
-) {
-  await db.users.update({
-    where: {
-      id: userId,
-    },
-    data: {
-      stripeCustomerId: customerId,
-      priceId,
-    },
-  });
+  plan: PricingPlan
+): Promise<void> {
+  await db.$transaction(async (trx) => {
+    const subscription: SubscriptionWithProducts =
+      await trx.subscription.findFirst({
+        where: { planTitle: plan.planTitle, timeline: plan.timeline },
+        include: { products: true },
+      });
 
-  await db.subscriptions.upsert({
-    where: {
-      userId,
-    },
-    create: {
-      userId,
-      subscriptionPlan: planTitle,
-    },
-    update: {
-      subscriptionPlan: planTitle,
-    },
+    await trx.productUsage.deleteMany({
+      where: { userId },
+    });
+
+    await trx.user.update({
+      where: { id: userId },
+      data: {
+        subscription: { connect: { id: subscription.id } },
+        stripeCustomerId: customerId,
+        priceId,
+        ProductUsage: {
+          create: subscription.products.map((product) => ({
+            id: generateId(15),
+            product: { connect: { id: product.id } },
+            remaining: product.quota,
+          })),
+        },
+      },
+    });
   });
 }
 
 async function handleCustomerSubscriptionDeleted(
   subscription: Stripe.Subscription
 ) {
-  const existingUser = await db.users.findUnique({
+  const existingUser = await db.user.findUnique({
     where: {
       stripeCustomerId: subscription.customer as string,
     },
+    include: { subscription: true },
   });
 
-  await db.subscriptions.delete({
-    where: {
-      userId: existingUser.id,
-    },
-  });
+  if (existingUser && existingUser.subscriptionId) {
+    await db.user.update({
+      where: { id: existingUser.id },
+      data: {
+        subscription: { disconnect: true },
+        ProductUsage: { deleteMany: {} },
+      },
+    });
+  }
 }

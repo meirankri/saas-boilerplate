@@ -1,20 +1,28 @@
 import { db } from "@/lib/database/db";
 import { getCurrentUser } from ".";
 import { GoogleUser } from "@/types";
+import { UserWithSubscription } from "@/types/user";
 
 export async function getAuthStatus() {
   const user = await getCurrentUser();
   if (!user) {
     return { user: null, subscription: null };
   }
-  const subscriptionData = await db.subscriptions.findUnique({
-    where: { userId: user.id },
-  });
-  console.log("subscriptionData", subscriptionData);
+  const response = (await db.user.findUnique({
+    where: { id: user.id },
+    include: {
+      subscription: {
+        include: {
+          products: true,
+          features: true,
+        },
+      },
+    },
+  })) as UserWithSubscription;
 
   return {
     user: user,
-    subscription: subscriptionData,
+    subscription: response.subscription,
   };
 }
 
@@ -24,7 +32,7 @@ export const oauthUpsertUser = async (
   accessTokenExpiresAt: Date,
   refreshToken: string | undefined
 ) => {
-  await db.transaction(async (trx) => {
+  await db.$transaction(async (trx) => {
     const existingUser = await trx.user.findFirst({
       where: { id: userData.id },
     });

@@ -1,6 +1,7 @@
 import HasAuthorizationServer from "@/components/auth/HasAutorizationServer";
 import IsForbidenServer from "@/components/auth/IsForbidenServer";
 import Pricing from "@/components/Pricing";
+import ProductPage from "@/components/TestGeneration";
 
 export default async function Home() {
   return (
@@ -9,6 +10,8 @@ export default async function Home() {
       <HasAuthorizationServer plans={["Premium"]}>
         <div className="bg-red-500 p-4">This is a premium content</div>
       </HasAuthorizationServer>
+
+      <ProductPage params={{ productName: "generate image" }} />
 
       <HasAuthorizationServer plans={["Basic plus"]}>
         <div className="bg-red-500 p-4">This is a basic plus content</div>

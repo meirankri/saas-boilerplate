@@ -8,7 +8,7 @@ interface IsForbidenProps {
 const IsForbiden = ({ plans, children }: IsForbidenProps) => {
   const { subscription } = useAuthAndSubscription();
 
-  if (plans.includes(subscription)) {
+  if (plans.includes(subscription?.planTitle)) {
     return;
   }
   return children;
