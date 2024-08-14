@@ -18,6 +18,7 @@ export interface ExtendedUser extends User {
   email: string;
   profilePictureUrl: string;
   name: string;
+  id: string;
 }
 
 export interface GoogleUser {

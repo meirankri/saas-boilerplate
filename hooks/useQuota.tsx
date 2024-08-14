@@ -1,5 +1,5 @@
-import { QuotaInfo, UseQuotaResult } from "@/types";
-import { useState, useCallback, useEffect, useReducer } from "react";
+import { UseQuotaResult } from "@/types";
+import { useCallback, useEffect, useReducer } from "react";
 
 async function fetchFromAPI(
   endpoint: string,
@@ -104,10 +104,5 @@ export function useQuota(
     fetchQuotaInfo();
   }, [fetchQuotaInfo]);
 
-  useEffect(() => {
-    console.log(
-      `Rendering with canUseProduct: ${state.canUseProduct} and remaining: ${state.remaining}`
-    );
-  }, [state.canUseProduct, state.remaining]);
   return { ...state, fetchQuotaInfo, decrementQuota, resetQuota };
 }

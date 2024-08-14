@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
+import Button from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -23,6 +23,9 @@ import {
 import { signIn } from "@/actions/magic-link.actions";
 import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
+import SignUpGoogle from "./Buttons/SIgnUpGoogle";
+import SignUpGithub from "./Buttons/SignUpGithub";
+import SignUpFacebook from "./Buttons/SignUpFacebook";
 
 export function SignForm() {
   const router = useRouter();
@@ -94,43 +97,27 @@ export function SignForm() {
   return (
     <>
       <div className="w-full flex item-center justify-center">
-        <Button
-          onClick={onGithubSignInClicked}
-          variant={"outline"}
-          className="w-full"
-        >
-          Sign in with Github
-        </Button>
+        <SignUpGithub onClick={onGithubSignInClicked} />
       </div>
 
       <div className="w-full flex item-center justify-center">
-        <Button
-          onClick={onGoogleSignInClicked}
-          variant={"outline"}
-          className="w-full"
-        >
-          Sign in with Google
-        </Button>
+        <SignUpGoogle onClick={onGoogleSignInClicked} />
       </div>
 
       <div className="w-full flex item-center justify-center">
-        <Button
-          onClick={onFacebookSignInClicked}
-          variant={"outline"}
-          className="w-full"
-        >
-          Sign in with Facebook
-        </Button>
+        <SignUpFacebook onClick={onFacebookSignInClicked} />
       </div>
 
-      <div className="w-full flex items-center justify-center gap-2">
-        <span className="border-b border-gray-300 w-full"></span>
-        <span className="flex-none">Or sign in with your email</span>
-        <span className="border-b border-gray-300 w-full"></span>
+      <div className="mb-8 flex items-center justify-center">
+        <span className="hidden h-[1px] w-full max-w-[70px] bg-body-color/50 sm:block"></span>
+        <p className="w-full px-5 text-center text-base font-medium text-body-color">
+          Or, sign in with your email
+        </p>
+        <span className="hidden h-[1px] w-full max-w-[70px] bg-body-color/50 sm:block"></span>
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+        <form onSubmit={form.handleSubmit(onSubmit)}>
           <FormField
             control={form.control}
             name="email"
@@ -138,13 +125,15 @@ export function SignForm() {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="shadcn" {...field} />
+                  <Input placeholder="Email" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
-          />{" "}
-          <Button type="submit">Submit</Button>
+          />
+          <div className="mb-6 mt-6">
+            <Button type="submit">Sign in</Button>
+          </div>
         </form>
       </Form>
     </>

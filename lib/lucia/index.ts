@@ -45,7 +45,7 @@ export const validateRequest = cache(async () => {
       );
     }
   } catch (e) {
-    console.log("Error setting session cookie", e);
+    console.error("Error setting session cookie", e);
   }
   return {
     user: extendedUser,

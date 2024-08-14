@@ -1,9 +1,10 @@
 "use client";
-
-import React, { useEffect } from "react";
+import React from "react";
 import { QuotaCheck } from "./quota/CheckQuota";
 import { useSession } from "@/providers/SessionProvider";
 import { useQuota } from "@/providers/QuotaProvider";
+import { ExtendedUser } from "@/types";
+import { isEmpty } from "@/utils/checker";
 
 export default function ProductPage({
   params,
@@ -11,8 +12,11 @@ export default function ProductPage({
   params: { productName: string };
 }) {
   const { productName } = params;
-  const session = useSession();
-  const userId = session?.id ?? null;
+  const session = useSession() as ExtendedUser;
+  let userId = null;
+  if (!isEmpty(session)) {
+    userId = session.id as ExtendedUser["id"];
+  }
   const { decrementQuota } = useQuota(userId, productName);
 
   const handleButtonClick: React.MouseEventHandler<HTMLButtonElement> = () => {

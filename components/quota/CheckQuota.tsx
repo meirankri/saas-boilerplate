@@ -5,6 +5,8 @@ import { useTranslations } from "next-intl";
 
 import { useSession } from "@/providers/SessionProvider";
 import { useQuota } from "@/providers/QuotaProvider";
+import { ExtendedUser } from "@/types";
+import { isEmpty } from "@/utils/checker";
 
 interface QuotaCheckProps {
   productName: string;
@@ -17,15 +19,15 @@ export function QuotaCheck({
   children,
   fallback,
 }: QuotaCheckProps) {
-  const session = useSession();
-  const userId = session?.id ?? null;
+  const { id } = (useSession() as ExtendedUser) || {};
+
   const t = useTranslations();
   const { quotaInfo, isLoading, error, canUseProduct } = useQuota(
-    userId,
+    id,
     productName
   );
 
-  if (!userId) {
+  if (!id) {
     return fallback ? (
       <>{fallback}</>
     ) : (

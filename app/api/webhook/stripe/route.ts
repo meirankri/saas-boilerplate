@@ -4,7 +4,7 @@ import Stripe from "stripe";
 import { db } from "@/lib/database/db";
 import { generateId } from "lucia";
 import { pricingPlanByPriceId } from "@/app/constants/stripe";
-import { isEmpty } from "@/lib/utils";
+import { isEmpty } from "@/utils/checker";
 import { PricingPlan } from "@/types";
 import { SubscriptionWithProducts } from "@/types/user";
 

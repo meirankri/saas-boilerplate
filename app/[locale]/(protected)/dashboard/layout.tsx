@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import "@/app/globals.css";
 import { getCurrentUser } from "@/lib/lucia";
 import { SessionProvider } from "@/providers/SessionProvider";
 import { QuotaProvider } from "@/providers/QuotaProvider";
@@ -20,9 +19,5 @@ export default async function RootLayout({
   if (!user) {
     return redirect("/sign-in");
   }
-  return (
-    <SessionProvider value={user}>
-      <QuotaProvider>{children}</QuotaProvider>
-    </SessionProvider>
-  );
+  return <QuotaProvider>{children}</QuotaProvider>;
 }

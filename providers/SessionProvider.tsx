@@ -2,7 +2,7 @@
 import { ExtendedUser } from "@/types";
 import { createContext, useContext } from "react";
 
-type SessionProviderProps = ExtendedUser | null;
+type SessionProviderProps = ExtendedUser | {};
 
 const SessionContext = createContext<SessionProviderProps>(
   {} as SessionProviderProps
