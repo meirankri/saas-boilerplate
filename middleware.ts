@@ -1,30 +1,53 @@
 import createMiddleware from "next-intl/middleware";
+
+import { NextRequest, NextResponse } from "next/server";
 import { locales } from "./i18n.config";
 
-export default createMiddleware({
-  // Use this locale when we can't match
-  // another with our user's preferred locales
-  // and when no locale is explicitly set.
-  defaultLocale: "en",
+const defaultLanguage = "en";
 
-  // List all supported locales (en-us, ar-eg).
+function getPreferredLocale(request) {
+  const acceptLanguageHeader = request.headers.get("Accept-Language");
+  if (!acceptLanguageHeader) return defaultLanguage;
+
+  const userLocales = acceptLanguageHeader
+    .split(",")
+    .map((lang) => lang.split(";")[0])
+    .map((lang) => lang.toLowerCase().trim());
+
+  for (const userLocale of userLocales) {
+    const matchedLocale = locales.find(
+      (locale) =>
+        userLocale === locale.toLowerCase() ||
+        userLocale.startsWith(locale.toLowerCase() + "-")
+    );
+    if (matchedLocale) return matchedLocale;
+  }
+
+  return defaultLanguage;
+}
+
+const intlMiddleware = createMiddleware({
   locales,
-
-  // Automatic locale detection is enabled by
-  // default. We're disabling it to keep things
-  // simple for now. We'll enable it later when
-  // we cover locale detection.
-  localeDetection: true,
+  defaultLocale: defaultLanguage,
   localePrefix: "as-needed",
 });
 
-// Our middleware only applies to routes that
-// match the following:
+export default function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+  const pathnameIsMissingLocale = locales.every(
+    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
+  );
+
+  // for browser language detection uncomment the following lines
+  // if (pathnameIsMissingLocale) {
+  //   // Si le chemin ne contient pas de locale, redirigez vers la locale préférée
+  //   const locale = getPreferredLocale(request);
+  //   return NextResponse.redirect(new URL(`/${locale}${pathname}`, request.url));
+  // }
+
+  return intlMiddleware(request);
+}
+
 export const config = {
-  matcher: [
-    // Match all pathnames except for
-    // - … if they start with `/api`, `/_next` or `/_vercel`
-    // - … the ones containing a dot (e.g. `favicon.ico`)
-    "/((?!api|_next|_vercel|.*\\..*).*)",
-  ],
+  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
 };

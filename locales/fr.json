@@ -2,6 +2,10 @@
     "Header": {
         "appTitle": "Meilleur SaaS Boilerplate"
     },
+    "Hero": {
+        "title": "Meilleur SaaS Boilerplate",
+        "description": "Démarrez votre prochain projet SaaS en quelques minutes"
+    },
     "QuotaCheck": {
         "exceeded": "Quota dépassé pour {productName}",
         "connexionError": "Veuillez vous connecter pour vérifier les quotas.",
