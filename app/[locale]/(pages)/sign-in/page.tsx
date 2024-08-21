@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import { validateRequest } from "@/lib/lucia";
+import { validateSession } from "@/lib/lucia";
 import { SignForm } from "@/components/SignForm";
 
 export const metadata: Metadata = {
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 const SigninPage = async () => {
-  const { user } = await validateRequest();
+  const { user } = await validateSession();
 
   if (user) {
     return redirect("/");

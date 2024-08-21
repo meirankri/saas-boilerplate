@@ -6,7 +6,7 @@ import { GoogleUser } from "@/types";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-async function validateRequest(
+async function validateSession(
   req: NextRequest
 ): Promise<{ code: string; state: string } | null> {
   const url = new URL(req.url);
@@ -65,7 +65,7 @@ async function createSessionAndSetCookies(userId: string) {
 
 export const GET = async (req: NextRequest) => {
   try {
-    const validatedRequest = await validateRequest(req);
+    const validatedRequest = await validateSession(req);
     if (!validatedRequest) {
       return Response.json({ error: "Invalid request" }, { status: 400 });
     }

@@ -1,12 +1,12 @@
 "use server";
-import { lucia, validateRequest } from "@/lib/lucia";
+import { lucia, validateSession } from "@/lib/lucia";
 import { cookies } from "next/headers";
 import { generateCodeVerifier, generateState } from "arctic";
 import { facebook, github, google } from "@/lib/lucia/oauth";
 
 export const signOut = async () => {
   try {
-    const { session } = await validateRequest();
+    const { session } = await validateSession();
 
     if (!session) {
       return {

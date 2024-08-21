@@ -84,29 +84,6 @@ export class QuotaService {
       },
     });
   }
-
-  async resetQuota(userId: string, productName: string) {
-    const productUsage = await this.getQuotaInfo(userId, productName);
-
-    if (!productUsage) {
-      throw new Error("User does not have access to this product");
-    }
-
-    return prisma.productUsage.update({
-      where: {
-        userId_productId: {
-          userId,
-          productId: productUsage.productId,
-        },
-      },
-      data: {
-        remaining: productUsage.product.quota,
-      },
-      include: {
-        product: true,
-      },
-    });
-  }
 }
 
 export const quotaService = new QuotaService();

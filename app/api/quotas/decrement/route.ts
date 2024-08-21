@@ -1,11 +1,20 @@
 import { quotaService } from "@/actions/quotas";
 import { NextResponse } from "next/server";
+import { validateSession } from "@/lib/lucia";
 
 export async function POST(request: Request) {
+  const { user } = await validateSession();
   try {
-    const { userId, productName, amount } = await request.json();
+    let productName = "",
+      amount = 0;
+    try {
+      ({ productName, amount } = await request.json());
+    } catch (e) {
+      return NextResponse.json({ error: "No request body" }, { status: 400 });
+    }
+    const userId = user?.id;
 
-    if (!userId || !productName || amount === undefined) {
+    if (!userId || !productName || !amount) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }

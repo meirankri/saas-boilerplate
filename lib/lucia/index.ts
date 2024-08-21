@@ -13,7 +13,7 @@ export const lucia = new Lucia(adapter, {
   getUserAttributes: (databaseUserAttributes) => databaseUserAttributes,
 });
 
-export const validateRequest = cache(async () => {
+export const validateSession = cache(async () => {
   const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
 
   if (!sessionId)
@@ -53,8 +53,25 @@ export const validateRequest = cache(async () => {
   };
 });
 
+export const protectRoute = async (): Promise<{
+  status: number;
+  body: { message: string };
+}> => {
+  const { session } = await validateSession();
+  if (!session) {
+    return {
+      status: 401,
+      body: { message: "Unauthorized" },
+    };
+  }
+  return {
+    status: 200,
+    body: { message: "Authorized" },
+  };
+};
+
 export const getCurrentUser = async (): Promise<ExtendedUser> => {
-  const { user } = await validateRequest();
+  const { user } = await validateSession();
   return user;
 };
 
