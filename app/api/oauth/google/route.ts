@@ -5,6 +5,7 @@ import { google } from "@/lib/lucia/oauth";
 import { GoogleUser } from "@/types";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { logger } from "@/utils/logger";
 
 async function validateSession(
   req: NextRequest
@@ -88,6 +89,10 @@ export const GET = async (req: NextRequest) => {
         );
       });
     } catch (error) {
+      logger({
+        message: "An unexpected error occurred during login",
+        context: error,
+      });
       return Response.json(
         { message: "An unexpected error occurred during login", error },
         { status: 500 }
@@ -103,6 +108,10 @@ export const GET = async (req: NextRequest) => {
       }
     );
   } catch (error: any) {
+    logger({
+      message: "Failed to sign in with Google",
+      context: error,
+    }).error();
     return Response.json(
       { error: error.message },
       {

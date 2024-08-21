@@ -1,6 +1,7 @@
 import { quotaService } from "@/actions/quotas";
 import { NextResponse } from "next/server";
 import { validateSession } from "@/lib/lucia";
+import { logger } from "@/utils/logger";
 
 export async function POST(request: Request) {
   const { user } = await validateSession();
@@ -33,7 +34,10 @@ export async function POST(request: Request) {
       productName: updatedQuota.product.name,
     });
   } catch (error) {
-    console.error("Failed to decrement quota:", error);
+    logger({
+      message: "Failed to decrement quota",
+      context: error,
+    });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
+import { logger } from "@/utils/logger";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -24,7 +25,10 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ productId: product.id });
   } catch (error) {
-    console.error("Error fetching product ID:", error);
+    logger({
+      message: "Failed to get product by name",
+      context: error,
+    });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

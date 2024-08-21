@@ -5,6 +5,7 @@ import { generateId } from "lucia";
 import { z } from "zod";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "@/lib/email";
+import { logger } from "@/utils/logger";
 
 const generateMagicLink = async (email: string, userId: string) => {
   const token = jwt.sign({ email: email, userId }, process.env.JWT_SECRET!, {
@@ -77,6 +78,10 @@ export const signIn = async (values: z.infer<typeof SignInSchema>) => {
       data: null,
     };
   } catch (error: any) {
+    logger({
+      message: "Failed to sign in",
+      context: error,
+    }).error();
     return {
       success: false,
       message: error?.message,

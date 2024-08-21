@@ -4,6 +4,7 @@ import { facebook } from "@/lib/lucia/oauth";
 import { generateId } from "lucia";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { logger } from "@/utils/logger";
 
 export const GET = async (req: NextRequest) => {
   try {
@@ -99,6 +100,10 @@ export const GET = async (req: NextRequest) => {
           },
         };
       } catch (error: any) {
+        logger({
+          message: "Failed to sign in",
+          context: error,
+        }).error();
         return {
           success: false,
           message: error.message,
@@ -128,6 +133,10 @@ export const GET = async (req: NextRequest) => {
       }
     );
   } catch (error: any) {
+    logger({
+      message: "Failed to sign in with Facebook",
+      context: error,
+    }).error();
     return Response.json(
       { error: error.message },
       {

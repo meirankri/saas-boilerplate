@@ -3,6 +3,7 @@ import { lucia, validateSession } from "@/lib/lucia";
 import { cookies } from "next/headers";
 import { generateCodeVerifier, generateState } from "arctic";
 import { facebook, github, google } from "@/lib/lucia/oauth";
+import { logger } from "@/utils/logger";
 
 export const signOut = async () => {
   try {
@@ -24,6 +25,10 @@ export const signOut = async () => {
       sessionCookie.attributes
     );
   } catch (error: any) {
+    logger({
+      message: "Failed to sign out",
+      context: error,
+    }).error();
     return {
       error: error?.message,
     };
@@ -56,6 +61,10 @@ export const createGoogleAuthorizationURL = async () => {
       data: authorizationURL.toString(),
     };
   } catch (error: any) {
+    logger({
+      message: "Failed to create Google authorization URL",
+      context: error,
+    }).error();
     return {
       error: error?.message,
     };
@@ -79,6 +88,10 @@ export const createGithubAuthorizationURL = async () => {
       data: authorizationURL.toString(),
     };
   } catch (error: any) {
+    logger({
+      message: "Failed to create Github authorization URL",
+      context: error,
+    }).error();
     return {
       error: error?.message,
     };
@@ -98,6 +111,10 @@ export const createFacebookAuthorizationURL = async () => {
       data: authorizationURL.toString(),
     };
   } catch (error: any) {
+    logger({
+      message: "Failed to create Facebook authorization URL",
+      context: error,
+    }).error();
     return {
       error: error?.message,
     };

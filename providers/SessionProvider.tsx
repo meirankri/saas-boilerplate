@@ -1,10 +1,10 @@
 "use client";
 import { ExtendedUser } from "@/types";
-import { createContext, useContext } from "react";
+import { createContext } from "react";
 
 type SessionProviderProps = ExtendedUser | {};
 
-const SessionContext = createContext<SessionProviderProps>(
+export const SessionContext = createContext<SessionProviderProps>(
   {} as SessionProviderProps
 );
 
@@ -18,14 +18,4 @@ export const SessionProvider = ({
   return (
     <SessionContext.Provider value={value}>{children}</SessionContext.Provider>
   );
-};
-
-export const useSession = () => {
-  const sessionContext = useContext(SessionContext);
-
-  if (!sessionContext) {
-    throw new Error("useSession must be used within a SessionProvider");
-  }
-
-  return sessionContext;
 };

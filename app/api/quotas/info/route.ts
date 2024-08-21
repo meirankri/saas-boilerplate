@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { quotaService } from "@/actions/quotas";
 import { validateSession } from "@/lib/lucia";
+import { logger } from "@/utils/logger";
 
 export async function GET(request: Request) {
   const { user } = await validateSession();
@@ -32,7 +33,10 @@ export async function GET(request: Request) {
       productName: quotaInfo.product.name,
     });
   } catch (error) {
-    console.error("Failed to fetch quota info:", error);
+    logger({
+      message: "Failed to get quota info",
+      context: error,
+    });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

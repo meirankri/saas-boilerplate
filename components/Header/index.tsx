@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import ThemeToggler from "./ThemeToggler";
 import menuData from "./menuData";
 import { Link } from "@/i18n.config";
-import { useSession } from "@/providers/SessionProvider";
+import { useSession } from "@/hooks/useSession";
 import UserMenu from "./UserMenu";
 import { isEmpty } from "@/utils/checker";
 
@@ -109,7 +109,6 @@ const Header = () => {
                   <ul className="block lg:flex lg:space-x-12">
                     {menuData.map(
                       (menuItem, index) =>
-                        // Vérifier si l'item est userOnly et si l'utilisateur est connecté
                         (!menuItem.userOnly ||
                           (menuItem.userOnly && !isEmpty(user))) && (
                           <li key={index} className="group relative">

@@ -1,13 +1,12 @@
 "use client";
 import React, {
   createContext,
-  useContext,
   useReducer,
   useCallback,
   useEffect,
-  Dispatch,
 } from "react";
-import { QuotaInfo, UseQuotaResult } from "@/types";
+import { QuotaInfo } from "@/types";
+import { logger } from "@/utils/logger";
 
 interface QuotaState {
   userId: string | null;
@@ -32,14 +31,15 @@ type QuotaAction =
 type QuotaContextType = QuotaState & {
   fetchQuotaInfo: () => Promise<void>;
   decrementQuota: (amount?: number) => Promise<void>;
-  resetQuota: () => Promise<void>;
   setUserIdAndProductName: (
     userId: string | null,
     productName: string | null
   ) => void;
 };
 
-const QuotaContext = createContext<QuotaContextType | undefined>(undefined);
+export const QuotaContext = createContext<QuotaContextType | undefined>(
+  undefined
+);
 
 async function fetchFromAPI(
   endpoint: string,
@@ -115,6 +115,10 @@ export function QuotaProvider({ children }: { children: React.ReactNode }) {
       );
       dispatch({ type: "FETCH_SUCCESS", data });
     } catch (err) {
+      logger({
+        message: "Failed to fetch quota info",
+        context: err,
+      });
       dispatch({
         type: "FETCH_ERROR",
         error: err instanceof Error ? err.message : "An unknown error occurred",
@@ -135,6 +139,10 @@ export function QuotaProvider({ children }: { children: React.ReactNode }) {
         });
         dispatch({ type: "FETCH_SUCCESS", data });
       } catch (err) {
+        logger({
+          message: "Failed to decrement quota",
+          context: err,
+        });
         dispatch({
           type: "FETCH_ERROR",
           error:
@@ -144,24 +152,6 @@ export function QuotaProvider({ children }: { children: React.ReactNode }) {
     },
     [state.userId, state.productName, state.remaining]
   );
-
-  const resetQuota = useCallback(async () => {
-    if (!state.userId || !state.productName) return;
-    dispatch({ type: "FETCH_START" });
-
-    try {
-      const data = await fetchFromAPI("reset", "POST", {
-        userId: state.userId,
-        productName: state.productName,
-      });
-      dispatch({ type: "FETCH_SUCCESS", data });
-    } catch (err) {
-      dispatch({
-        type: "FETCH_ERROR",
-        error: err instanceof Error ? err.message : "An unknown error occurred",
-      });
-    }
-  }, [state.userId, state.productName]);
 
   useEffect(() => {
     if (state.userId && state.productName) {
@@ -173,29 +163,10 @@ export function QuotaProvider({ children }: { children: React.ReactNode }) {
     ...state,
     fetchQuotaInfo,
     decrementQuota,
-    resetQuota,
     setUserIdAndProductName,
   };
 
   return (
     <QuotaContext.Provider value={value}>{children}</QuotaContext.Provider>
   );
-}
-
-export function useQuota(
-  initialUserId: string | null,
-  initialProductName: string | null
-): UseQuotaResult {
-  const context = useContext(QuotaContext);
-  if (context === undefined) {
-    throw new Error("useQuota must be used within a QuotaProvider");
-  }
-
-  const { setUserIdAndProductName, ...restContext } = context;
-
-  useEffect(() => {
-    setUserIdAndProductName(initialUserId, initialProductName);
-  }, [initialUserId, initialProductName, setUserIdAndProductName]);
-
-  return restContext;
 }

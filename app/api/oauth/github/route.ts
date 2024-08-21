@@ -4,6 +4,7 @@ import { github } from "@/lib/lucia/oauth";
 import { generateId } from "lucia";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { logger } from "@/utils/logger";
 
 export const GET = async (req: NextRequest) => {
   try {
@@ -79,6 +80,10 @@ export const GET = async (req: NextRequest) => {
       }
     );
   } catch (error: any) {
+    logger({
+      message: "Failed to sign in with GitHub",
+      context: error,
+    }).error();
     return Response.json(
       { error: error.message },
       {
@@ -144,9 +149,18 @@ async function handleGitHubAuth(githubData: GitHubData, accessToken: string) {
         }
       }
 
-      return true; // Successful transaction
+      return true;
     });
   } catch (error) {
-    console.error("Transaction failed:", error);
+    logger({
+      message: "Failed to handle GitHub auth",
+      context: error,
+    }).error();
+    return Response.json(
+      { error: error.message },
+      {
+        status: 500,
+      }
+    );
   }
 }

@@ -3,10 +3,9 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 
-import { useSession } from "@/providers/SessionProvider";
-import { useQuota } from "@/providers/QuotaProvider";
+import { useSession } from "@/hooks/useSession";
+import { useQuota } from "@/hooks/useQuota";
 import { ExtendedUser } from "@/types";
-import { isEmpty } from "@/utils/checker";
 
 interface QuotaCheckProps {
   productName: string;

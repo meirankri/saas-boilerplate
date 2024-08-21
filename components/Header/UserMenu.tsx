@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 
-import { useSession } from "@/providers/SessionProvider";
+import { useSession } from "@/hooks/useSession";
 import { signOut } from "@/actions/auth.actions";
 import { ExtendedUser } from "@/types";
 
@@ -24,7 +24,7 @@ const UserMenu = () => {
               className="h-8 w-8 rounded-full"
             />
           ) : (
-            <span className="h-8 w-8 rounded-full bg-white flex justify-center items-center">
+            <span className="h-8 w-8 rounded-full dark:text-black  bg-white flex justify-center items-center">
               {user.email.slice(0, 1)}
             </span>
           )}

@@ -7,6 +7,7 @@ import { pricingPlanByPriceId } from "@/app/constants/stripe";
 import { isEmpty } from "@/utils/checker";
 import { PricingPlan } from "@/types";
 import { SubscriptionWithProducts } from "@/types/user";
+import { logger } from "@/utils/logger";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
@@ -44,7 +45,10 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ received: true });
   } catch (err: any) {
-    console.error(`Webhook error: ${err.message}`);
+    logger({
+      message: "Failed to handle stripe webhook",
+      context: err,
+    });
     return NextResponse.json({ error: err.message }, { status: 400 });
   }
 }

@@ -46,7 +46,6 @@ export interface UseQuotaResult {
   remaining: number;
   fetchQuotaInfo: () => Promise<void>;
   decrementQuota: (amount?: number) => Promise<void>;
-  resetQuota: () => Promise<void>;
 }
 
 export type PricingPlan = {

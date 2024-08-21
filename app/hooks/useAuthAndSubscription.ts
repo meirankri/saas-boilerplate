@@ -1,5 +1,5 @@
-// hooks/useAuth.ts
 import { useEffect, useState } from "react";
+import { logger } from "@/utils/logger";
 
 export default function useAuthAndSubscription() {
   const [user, setUser] = useState(null);
@@ -16,7 +16,10 @@ export default function useAuthAndSubscription() {
           setSubscription(data.subscription);
         }
       } catch (error) {
-        console.error("error during the verification:", error);
+        logger({
+          message: "Failed to check user status",
+          context: error,
+        });
       } finally {
         setLoading(false);
       }

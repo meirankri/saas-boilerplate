@@ -3,6 +3,7 @@ import adapter from "./prismaAdapter";
 import { cookies } from "next/headers";
 import { cache } from "react";
 import { ExtendedUser } from "@/types";
+import { logger } from "@/utils/logger";
 
 export const lucia = new Lucia(adapter, {
   sessionCookie: {
@@ -45,7 +46,10 @@ export const validateSession = cache(async () => {
       );
     }
   } catch (e) {
-    console.error("Error setting session cookie", e);
+    logger({
+      message: "Failed to set session cookie",
+      context: e,
+    }).error();
   }
   return {
     user: extendedUser,

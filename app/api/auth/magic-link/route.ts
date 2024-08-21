@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { db } from "@/lib/database/db";
 import { lucia } from "@/lib/lucia";
 import { cookies } from "next/headers";
+import { logger } from "@/utils/logger";
 
 export const GET = async (req: NextRequest) => {
   try {
@@ -67,6 +68,10 @@ export const GET = async (req: NextRequest) => {
 
     return Response.redirect(new URL(process.env.NEXT_PUBLIC_BASE_URL!), 302);
   } catch (e: any) {
+    logger({
+      message: "Failed to sign in with magic link",
+      context: e,
+    }).error();
     return Response.json(
       {
         error: e.message,
