@@ -13,16 +13,23 @@ const crossIcon = (
 const OfferList = ({
   text,
   status,
+  quota,
 }: {
   text: string;
-  status: "active" | "inactive";
+  status?: "active" | "inactive";
+  quota?: number;
 }) => {
   return (
-    <div className="mb-3 flex items-center">
+    <div className="mb-3 flex text-black dark:text-white items-center">
       <span className="mr-3 flex h-[18px] w-full max-w-[18px] items-center justify-center rounded-full bg-primary bg-opacity-10 text-primary">
-        {status === "active" ? checkIcon : crossIcon}
+        {status && status === "active" ? checkIcon : crossIcon}
       </span>
-      <p className="m-0 text-base font-medium text-body-color">{text}</p>
+      <p className="m-0 text-black dark:text-white text-base font-medium ">
+        {text}
+      </p>
+      {quota && (
+        <span className="ml-2 text-xs font-semibold">{quota}/month</span>
+      )}
     </div>
   );
 };

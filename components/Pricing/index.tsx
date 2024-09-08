@@ -1,32 +1,74 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
+
 import SectionTitle from "../Common/SectionTitle";
 import OfferList from "./OfferList";
 import PricingBox from "./PricingBox";
 import { pricingList } from "@/app/constants/stripe";
+import { ExtendedPricingPlan } from "@/types";
 
 const Pricing = () => {
   const [isMonthly, setIsMonthly] = useState(true);
+  const t = useTranslations();
 
-  const currentPricings = isMonthly
-    ? pricingList.monthlyPricings
-    : pricingList.yearlyPricings;
+  const {
+    currentPricings,
+    averageDiscount,
+  }: {
+    currentPricings: ExtendedPricingPlan[];
+    averageDiscount: string | number;
+  } = useMemo(() => {
+    const monthlyPricings = pricingList.monthlyPricings;
+    const yearlyPricings = pricingList.yearlyPricings.map((yearly) => {
+      const monthlyEquivalent = yearly.price / 12;
+      const monthlyPlan = monthlyPricings.find(
+        (plan) => plan.planTitle === yearly.planTitle
+      );
+      const discountPercentage = monthlyPlan
+        ? Math.round((1 - monthlyEquivalent / monthlyPlan.price) * 100)
+        : 0;
+      return {
+        ...yearly,
+        monthlyEquivalent: monthlyEquivalent.toFixed(2),
+        discount: discountPercentage,
+      };
+    });
+
+    const totalDiscount = yearlyPricings.reduce(
+      (acc, plan) => acc + (plan.discount || 0),
+      0
+    );
+    const averageDiscount = yearlyPricings.length
+      ? (totalDiscount / yearlyPricings.length).toFixed(0)
+      : 0;
+
+    return {
+      currentPricings: isMonthly ? monthlyPricings : yearlyPricings,
+      averageDiscount,
+    };
+  }, [isMonthly]);
 
   return (
     <section id="pricing" className="relative z-10 py-16 md:py-20 lg:py-28">
       <div className="container">
         <SectionTitle
-          title="Simple and Affordable Pricing"
-          paragraph="Choose the plan that fits your needs."
+          title={t("pricing.title")}
+          paragraph={t("pricing.description")}
           center
           width="665px"
         />
 
         <div className="w-full">
           <div
-            className="wow fadeInUp mb-8 flex justify-center md:mb-12 lg:mb-16"
+            className="wow fadeInUp mb-8 flex flex-wrap justify-center md:mb-12 lg:mb-16"
             data-wow-delay=".1s"
           >
+            {!isMonthly && (
+              <div className="w-full text-center pb-3">
+                {t("pricing.discount", { discount: averageDiscount })}
+              </div>
+            )}
             <span
               onClick={() => setIsMonthly(true)}
               className={`${
@@ -35,7 +77,7 @@ const Pricing = () => {
                   : "text-dark dark:text-white"
               } mr-4 cursor-pointer text-base font-semibold`}
             >
-              Monthly
+              {t("pricing.monthly")}
             </span>
             <div
               onClick={() => setIsMonthly(!isMonthly)}
@@ -60,29 +102,61 @@ const Pricing = () => {
                   : "pointer-events-none text-primary"
               } ml-4 cursor-pointer text-base font-semibold`}
             >
-              Yearly
+              {t("pricing.yearly")}
             </span>
           </div>
         </div>
 
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
-          {currentPricings.map((pricing, index) => (
-            <PricingBox
-              key={index}
-              packageName={pricing.planTitle}
-              price={pricing.price.toString()}
-              duration={pricing.timeline}
-              subtitle={pricing.description}
-            >
-              {pricing.features.map((feature, featureIndex) => (
-                <OfferList
-                  key={featureIndex}
-                  text={feature.label}
-                  status={feature.isActive ? "active" : "inactive"}
-                />
-              ))}
-            </PricingBox>
-          ))}
+          {currentPricings.map((pricing, index) => {
+            const {
+              planTitle,
+              products,
+              price,
+              monthlyEquivalent,
+              currency,
+              timeline,
+              description,
+              features,
+              link,
+            } = pricing;
+            return (
+              <PricingBox
+                key={index}
+                link={link}
+                packageName={t(`pricing.${planTitle}`)}
+                currency={currency}
+                price={isMonthly ? price.toString() : monthlyEquivalent}
+                duration={t(`pricing.${timeline}`)}
+                subtitle={t(`pricing.${description}`)}
+                buttonText={t("pricing.choosePlan")}
+              >
+                {products &&
+                  products.map((product, productIndex) => (
+                    <OfferList
+                      key={productIndex}
+                      text={t(`pricing.${product.name}`)}
+                      quota={product.quota}
+                      status="active"
+                    />
+                  ))}
+                {features &&
+                  features.map((feature, featureIndex) => (
+                    <OfferList
+                      key={featureIndex}
+                      text={t(`pricing.${feature.label}`)}
+                      status={feature.isActive ? "active" : "inactive"}
+                    />
+                  ))}
+                <div className="flex items-center justify-between">
+                  <span className=" font-semibold">
+                    {t("pricing.annualPayment", { price })}
+                    {currency}
+                  </span>
+                </div>
+              </PricingBox>
+            );
+          })}
         </div>
       </div>
 

@@ -9,6 +9,7 @@ import { getMessages } from "next-intl/server";
 import Footer from "@/components/Footer";
 import { getCurrentUser } from "@/lib/lucia";
 import { SessionProvider } from "@/providers/SessionProvider";
+import { updateSessionCookie } from "@/actions/auth.actions";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,12 +28,14 @@ export default async function LocaleLayout({
   const messages = await getMessages({ locale });
   const user = (await getCurrentUser()) || {};
 
+  await updateSessionCookie();
+
   return (
     <html lang={locale}>
       <body className={inter.className}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider>
-            <SessionProvider value={user}>
+            <SessionProvider value={user || {}}>
               <Header />
               {children}
               <Toaster />

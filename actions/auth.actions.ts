@@ -120,3 +120,26 @@ export const createFacebookAuthorizationURL = async () => {
     };
   }
 };
+
+export async function updateSessionCookie() {
+  const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
+
+  if (sessionId) {
+    const { session } = await lucia.validateSession(sessionId);
+    if (session && session.fresh) {
+      const sessionCookie = lucia.createSessionCookie(session.id);
+      cookies().set(
+        sessionCookie.name,
+        sessionCookie.value,
+        sessionCookie.attributes
+      );
+    } else if (!session) {
+      const sessionCookie = lucia.createBlankSessionCookie();
+      cookies().set(
+        sessionCookie.name,
+        sessionCookie.value,
+        sessionCookie.attributes
+      );
+    }
+  }
+}

@@ -52,10 +52,21 @@ export type PricingPlan = {
   planTitle: string;
   price: number;
   timeline: string;
+  currency: string;
   link: string;
   priceId: string;
   description: string;
+  products: {
+    name: string;
+    quota: number;
+  }[];
   features: {
     label: string;
+    isActive: boolean;
   }[];
 };
+
+export interface ExtendedPricingPlan extends PricingPlan {
+  monthlyEquivalent?: string;
+  discount?: number;
+}
