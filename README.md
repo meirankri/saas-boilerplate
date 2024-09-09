@@ -62,7 +62,7 @@ Follow these steps to get your SaaS project up and running on your local machine
 
 ### Get the updates
 
-### 1. Add New Remote for This Repository
+ **1. Add New Remote for This Repository**
 
 After cloning, rename the original remote and add the new repository's URL as `origin`:
 
@@ -73,7 +73,7 @@ git remote add origin <new-repo-url>
 
 This will keep the upstream (original) repository as `upstream` and the new repository as `origin`.
 
-### 2. Push to the New Repository
+**2. Push to the New Repository**
 
 To push the cloned repository to your new GitHub repository:
 
@@ -81,7 +81,7 @@ To push the cloned repository to your new GitHub repository:
 git push -u origin main
 ```
 
-### 3. Keep Your Repository Updated with Rebase
+ **3. Keep Your Repository Updated with Rebase**
 
 Whenever there are updates in the original repository, you can update your fork by fetching the changes and rebasing:
 
