@@ -56,6 +56,7 @@ export type PricingPlan = {
   link: string;
   priceId: string;
   description: string;
+  stripeTimeline: string;
   products: {
     name: string;
     quota: number;

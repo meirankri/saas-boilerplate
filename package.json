@@ -7,7 +7,7 @@
     "start": "next start",
     "lint": "next lint",
     "generate": "prisma migrate dev --name",
-    "seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts"
+    "createProduct": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
@@ -39,6 +39,7 @@
     "react-dom": "^18",
     "react-hook-form": "^7.50.1",
     "resend": "^3.2.0",
+    "sharp": "^0.33.5",
     "stripe": "^16.2.0",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",

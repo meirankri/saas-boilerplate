@@ -145,7 +145,7 @@ To manage payments, follow these steps:
      // Add more plans as needed
    };
 
-3. run yarn seed to populate the database
+3. run yarn createProduct to populate the database
 
 ## Deployment
 
