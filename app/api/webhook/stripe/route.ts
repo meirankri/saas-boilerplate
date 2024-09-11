@@ -7,6 +7,7 @@ import { pricingPlanByPriceId } from "@/app/constants/stripe";
 import { isEmpty } from "@/utils/checker";
 import { PricingPlan } from "@/types";
 import { SubscriptionWithProducts } from "@/types/user";
+import { addMonths } from "@/utils/date";
 import { logger } from "@/utils/logger";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -108,9 +109,13 @@ async function createNewUser(
   await db.$transaction(async (trx) => {
     const subscription: SubscriptionWithProducts =
       await trx.subscription.findFirst({
-        where: { planTitle: plan.planTitle, timeline: plan.timeline },
+        where: {
+          planTitle: plan.planTitle,
+          timeline: plan.stripeTimeline,
+        },
         include: { products: true },
       });
+    const now = new Date();
 
     await trx.user.create({
       data: {
@@ -118,6 +123,8 @@ async function createNewUser(
         email,
         stripeCustomerId: customerId,
         priceId,
+        subscriptionDate: now,
+        nextQuotaRenewalDate: addMonths(now, 1),
         subscription: {
           connect: { id: subscription.id },
         },
@@ -141,19 +148,25 @@ async function updateExistingUser(
   await db.$transaction(async (trx) => {
     const subscription: SubscriptionWithProducts =
       await trx.subscription.findFirst({
-        where: { planTitle: plan.planTitle, timeline: plan.timeline },
+        where: {
+          planTitle: plan.planTitle,
+          timeline: plan.stripeTimeline,
+        },
         include: { products: true },
       });
 
     await trx.productUsage.deleteMany({
       where: { userId },
     });
+    const now = new Date();
 
     await trx.user.update({
       where: { id: userId },
       data: {
         subscription: { connect: { id: subscription.id } },
         stripeCustomerId: customerId,
+        subscriptionDate: now,
+        nextQuotaRenewalDate: addMonths(now, 1),
         priceId,
         ProductUsage: {
           create: subscription.products.map((product) => ({

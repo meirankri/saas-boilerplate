@@ -11,7 +11,7 @@ async function main() {
       const data: any = {
         planTitle: plan.planTitle,
         price: plan.price,
-        timeline: plan.stripeTimeline,
+        timeline: plan.stripeTimeline.toUpperCase(),
         stripeLink: plan.link,
         stripePriceId: plan.priceId,
         description: plan.description,

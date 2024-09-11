@@ -10,6 +10,7 @@ import { ExtendedPricingPlan } from "@/types";
 
 const Pricing = () => {
   const [isMonthly, setIsMonthly] = useState(true);
+
   const t = useTranslations();
 
   const {
@@ -126,7 +127,7 @@ const Pricing = () => {
                 link={link}
                 packageName={t(`pricing.${planTitle}`)}
                 currency={currency}
-                price={isMonthly ? price.toString() : monthlyEquivalent}
+                price={isMonthly ? price : monthlyEquivalent}
                 duration={t(`pricing.${timeline}`)}
                 subtitle={t(`pricing.${description}`)}
                 buttonText={t("pricing.choosePlan")}

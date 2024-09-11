@@ -7,7 +7,7 @@
     "start": "next start",
     "lint": "next lint",
     "generate": "prisma migrate dev --name",
-    "createProduct": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts"
+    "createProduct": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/subscriptions.ts"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
@@ -25,6 +25,7 @@
     "bcrypt": "^5.1.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
+    "date-fns": "^3.6.0",
     "jsonwebtoken": "^9.0.2",
     "lucia": "^3.0.1",
     "lucide-react": "^0.335.0",

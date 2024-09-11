@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { generateCodeVerifier, generateState } from "arctic";
 import { facebook, github, google } from "@/lib/lucia/oauth";
 import { logger } from "@/utils/logger";
+import { checkAndRenewQuotas } from "./quotas";
 
 export const signOut = async () => {
   try {
@@ -125,15 +126,26 @@ export async function updateSessionCookie() {
   const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
 
   if (sessionId) {
-    const { session } = await lucia.validateSession(sessionId);
-    if (session && session.fresh) {
-      const sessionCookie = lucia.createSessionCookie(session.id);
-      cookies().set(
-        sessionCookie.name,
-        sessionCookie.value,
-        sessionCookie.attributes
-      );
-    } else if (!session) {
+    const { session, user } = await lucia.validateSession(sessionId);
+    if (session) {
+      try {
+        await checkAndRenewQuotas(user.id);
+      } catch (e) {
+        logger({
+          message: "error On checkAndRenewQuotas",
+          context: user,
+        }).error();
+      }
+
+      if (session.fresh) {
+        const sessionCookie = lucia.createSessionCookie(session.id);
+        cookies().set(
+          sessionCookie.name,
+          sessionCookie.value,
+          sessionCookie.attributes
+        );
+      }
+    } else {
       const sessionCookie = lucia.createBlankSessionCookie();
       cookies().set(
         sessionCookie.name,

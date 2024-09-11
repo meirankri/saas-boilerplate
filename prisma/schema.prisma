@@ -8,17 +8,20 @@ datasource db {
 }
 
 model User {
-  id                String         @id @default(uuid())
-  email             String         @unique
-  isEmailVerified   Boolean        @default(false)
-  profilePictureUrl String?
-  stripeCustomerId  String?        @unique
-  priceId           String?
-  name              String?
-  subscription      Subscription?  @relation(fields: [subscriptionId], references: [id])
-  oauthAccounts     OauthAccount[]
-  magicLinks        MagicLink[]
-  sessions          Session[]
+  id                   String    @id @default(uuid())
+  email                String    @unique
+  isEmailVerified      Boolean   @default(false)
+  profilePictureUrl    String?
+  stripeCustomerId     String?   @unique
+  priceId              String?
+  name                 String?
+  nextQuotaRenewalDate DateTime?
+  subscriptionDate     DateTime?
+
+  subscription  Subscription?  @relation(fields: [subscriptionId], references: [id])
+  oauthAccounts OauthAccount[]
+  magicLinks    MagicLink[]
+  sessions      Session[]
 
   ProductUsage   ProductUsage[]
   subscriptionId String?
@@ -46,11 +49,16 @@ model ProductUsage {
   @@unique([userId, productId])
 }
 
+enum Timeline {
+  MONTHLY
+  YEARLY
+}
+
 model Subscription {
   id            String    @id @default(uuid())
   planTitle     String
   price         Decimal
-  timeline      String
+  timeline      Timeline  @default(MONTHLY)
   description   String
   stripePriceId String?
   stripeLink    String?

@@ -56,7 +56,7 @@ export type PricingPlan = {
   link: string;
   priceId: string;
   description: string;
-  stripeTimeline: string;
+  stripeTimeline: "MONTHLY" | "YEARLY";
   products: {
     name: string;
     quota: number;
@@ -68,6 +68,6 @@ export type PricingPlan = {
 };
 
 export interface ExtendedPricingPlan extends PricingPlan {
-  monthlyEquivalent?: string;
+  monthlyEquivalent?: number;
   discount?: number;
 }
