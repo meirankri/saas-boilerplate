@@ -3,6 +3,7 @@ import { PricingPlan } from "@/types";
 export const pricingList: {
   monthlyPricings: PricingPlan[];
   yearlyPricings: PricingPlan[];
+  freeTrial: PricingPlan;
 } = {
   monthlyPricings: [
     {
@@ -142,6 +143,27 @@ export const pricingList: {
       ],
     },
   ],
+  freeTrial: {
+    planTitle: "free_trial",
+    price: 0,
+    currency: "$",
+    timeline: "timeline_month",
+    stripeTimeline: "ONETIME",
+    link: "",
+    priceId: "price_free_trial",
+    description: "description_free_trial",
+    features: [
+      { isActive: true, label: "feature_build_links" },
+      { isActive: true, label: "feature_complex_over_66" },
+      { isActive: false, label: "feature_contact_support_24_7" },
+      { isActive: false, label: "feature_build_tools_easily" },
+      { isActive: false, label: "feature_storage_6tb" },
+    ],
+    products: [
+      { name: "product_link_builder", quota: 10 },
+      { name: "product_complex_analysis", quota: 5 },
+    ],
+  },
 };
 
 export const pricingPlanByPriceId = (priceId: string): PricingPlan => {

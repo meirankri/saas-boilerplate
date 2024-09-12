@@ -6,41 +6,48 @@ const prisma = new PrismaClient();
 async function main() {
   await prisma.subscription.deleteMany({});
 
-  for (const typeOfPlan of Object.values(pricingList)) {
-    for (const plan of typeOfPlan) {
-      const data: any = {
-        planTitle: plan.planTitle,
-        price: plan.price,
-        timeline: plan.stripeTimeline.toUpperCase(),
-        stripeLink: plan.link,
-        stripePriceId: plan.priceId,
-        description: plan.description,
+  const createSubscription = async (plan: any) => {
+    const data: any = {
+      planTitle: plan.planTitle,
+      price: plan.price,
+      timeline: plan.stripeTimeline,
+      stripeLink: plan.link,
+      stripePriceId: plan.priceId,
+      description: plan.description,
+    };
+
+    if ("features" in plan) {
+      const features = plan.features
+        .filter((feature: any) => feature.isActive)
+        .map((feature: any) => ({
+          label: feature.label,
+        }));
+      data.features = {
+        create: features,
       };
+    }
 
-      if ("features" in plan) {
-        const features = plan.features
-          .filter((feature: any) => feature.isActive)
-          .map((feature: any) => ({
-            label: feature.label,
-          }));
-        data.features = {
-          create: features,
-        };
-      }
+    if ("products" in plan) {
+      data.products = {
+        create: plan.products,
+      };
+    }
 
-      if ("products" in plan) {
-        data.products = {
-          create: plan.products,
-        };
-      }
+    await prisma.subscription.create({
+      data,
+    });
+  };
 
-      await prisma.subscription.create({
-        data,
-      });
+  for (const typeOfPlan of [
+    pricingList.monthlyPricings,
+    pricingList.yearlyPricings,
+  ]) {
+    for (const plan of typeOfPlan) {
+      await createSubscription(plan);
     }
   }
 
-  console.info("Seed data inserted successfully.");
+  await createSubscription(pricingList.freeTrial);
 }
 
 main()

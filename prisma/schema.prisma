@@ -52,13 +52,14 @@ model ProductUsage {
 enum Timeline {
   MONTHLY
   YEARLY
+  ONETIME
 }
 
 model Subscription {
   id            String    @id @default(uuid())
   planTitle     String
   price         Decimal
-  timeline      Timeline  @default(MONTHLY)
+  timeline      Timeline? @default(MONTHLY)
   description   String
   stripePriceId String?
   stripeLink    String?

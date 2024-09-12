@@ -56,7 +56,7 @@ export type PricingPlan = {
   link: string;
   priceId: string;
   description: string;
-  stripeTimeline: "MONTHLY" | "YEARLY";
+  stripeTimeline: "MONTHLY" | "YEARLY" | "ONETIME";
   products: {
     name: string;
     quota: number;

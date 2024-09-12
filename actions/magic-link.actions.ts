@@ -6,6 +6,7 @@ import { z } from "zod";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "@/lib/email";
 import { logger } from "@/utils/logger";
+import { addFreeTrialSubscription } from "@/lib/lucia/auth";
 
 const generateMagicLink = async (email: string, userId: string) => {
   const token = jwt.sign({ email: email, userId }, process.env.JWT_SECRET!, {
@@ -64,6 +65,8 @@ export const signIn = async (values: z.infer<typeof SignInSchema>) => {
           token: res.data.token,
         },
       });
+
+      await addFreeTrialSubscription(db, userId);
 
       await sendEmail({
         to: values.email,
