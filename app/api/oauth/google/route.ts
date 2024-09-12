@@ -1,4 +1,3 @@
-import { db } from "@/lib/database/db";
 import { lucia } from "@/lib/lucia";
 import { oauthUpsertUser } from "@/lib/lucia/auth";
 import { google } from "@/lib/lucia/oauth";
@@ -78,16 +77,14 @@ export const GET = async (req: NextRequest) => {
       await google.validateAuthorizationCode(code, codeVerifier);
 
     const googleData = await getGoogleUserData(accessToken);
-
+    let userId: string;
     try {
-      await db.$transaction((trx) => {
-        return oauthUpsertUser(
-          googleData,
-          accessToken,
-          accessTokenExpiresAt,
-          refreshToken
-        );
-      });
+      userId = await oauthUpsertUser(
+        googleData,
+        accessToken,
+        accessTokenExpiresAt,
+        refreshToken
+      );
     } catch (error) {
       logger({
         message: "An unexpected error occurred during login",
@@ -99,7 +96,7 @@ export const GET = async (req: NextRequest) => {
       );
     }
 
-    await createSessionAndSetCookies(googleData.id);
+    await createSessionAndSetCookies(userId);
 
     return NextResponse.redirect(
       new URL("/dashboard", process.env.NEXT_PUBLIC_BASE_URL),

@@ -3,6 +3,7 @@ import { getCurrentUser } from ".";
 import { GoogleUser } from "@/types";
 import { UserWithSubscription } from "@/types/user";
 import { logger } from "@/utils/logger";
+import { OauthAccount, User } from "@prisma/client";
 
 export async function getAuthStatus(): Promise<{
   user: UserWithSubscription | null;
@@ -44,34 +45,59 @@ export const oauthUpsertUser = async (
   accessToken: string,
   accessTokenExpiresAt: Date,
   refreshToken: string | undefined
-): Promise<void> => {
+): Promise<string> => {
   try {
+    let newUser: User;
+    let user: User & {
+      oauthAccounts: OauthAccount[];
+    };
     await db.$transaction(async (trx) => {
-      const existingUser = await trx.user.findFirst({
-        where: { id: userData.id },
+      user = await trx.user.findFirst({
+        where: { email: userData.email },
+        include: { oauthAccounts: true },
       });
+      if (!user) {
+        newUser = await trx.user.create({
+          data: {
+            id: userData.id,
+            email: userData.email,
+            name: userData.name,
+            profilePictureUrl: userData.picture,
+          },
+        });
 
-      if (!existingUser) {
-        await createNewUser(trx, userData);
-        await createOAuthAccount(
+        await addFreeTrialSubscription(trx, newUser.id);
+      }
+
+      if (user.oauthAccounts.length > 0) {
+        const [oauthAccount] = user.oauthAccounts;
+        await updateOAuthAccount(
           trx,
-          userData,
+          oauthAccount.id,
           accessToken,
           accessTokenExpiresAt,
           refreshToken
         );
-        const free = await addFreeTrialSubscription(trx, userData.id);
-        console.log("free", free);
       } else {
-        await updateOAuthAccount(
+        await createOAuthAccount(
           trx,
+          user.id,
           userData.id,
           accessToken,
           accessTokenExpiresAt,
           refreshToken
         );
       }
+
+      await trx.user.update({
+        where: { id: user.id },
+        data: {
+          name: user.name || userData.name,
+          profilePictureUrl: userData.picture,
+        },
+      });
     });
+    return newUser?.id || user.id;
   } catch (error) {
     logger({
       message: "Error during OAuth user upsert",
@@ -80,32 +106,21 @@ export const oauthUpsertUser = async (
   }
 };
 
-async function createNewUser(trx: any, userData: GoogleUser): Promise<void> {
-  await trx.user.create({
-    data: {
-      email: userData.email,
-      id: userData.id,
-      name: userData.name,
-      profilePictureUrl: userData.picture,
-    },
-  });
-}
-
 async function createOAuthAccount(
   trx: any,
-  userData: GoogleUser,
+  userId: string,
+  providerUserId: string,
   accessToken: string,
   accessTokenExpiresAt: Date,
   refreshToken: string | undefined
 ): Promise<void> {
   await trx.oauthAccount.create({
     data: {
+      userId,
+      provider: "google",
+      providerUserId,
       accessToken,
       expiresAt: accessTokenExpiresAt,
-      id: userData.id,
-      provider: "google",
-      providerUserId: userData.id,
-      userId: userData.id,
       refreshToken,
     },
   });
@@ -113,13 +128,13 @@ async function createOAuthAccount(
 
 async function updateOAuthAccount(
   trx: any,
-  userId: string,
+  oauthAccountId: string,
   accessToken: string,
   accessTokenExpiresAt: Date,
   refreshToken: string | undefined
 ): Promise<void> {
   await trx.oauthAccount.update({
-    where: { id: userId },
+    where: { id: oauthAccountId },
     data: {
       accessToken,
       expiresAt: accessTokenExpiresAt,
