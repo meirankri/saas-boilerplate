@@ -8,7 +8,8 @@
     },
     "UserQuotaFeatures": {
         "quotas": "Quotas",
-        "features": "Features"
+        "features": "Features",
+        "loading": "Loading..."
     },
     "QuotaCheck": {
         "exceeded": "Quota exceeded for {productName}",

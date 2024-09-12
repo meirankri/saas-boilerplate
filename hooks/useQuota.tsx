@@ -4,8 +4,8 @@ import { QuotaContext } from "@/providers/QuotaProvider";
 import { UseQuotaResult } from "@/types";
 
 export function useQuota(
-  initialUserId: string | null,
-  initialProductName: string | null
+  initialUserId?: string | null,
+  initialProductName?: string | null
 ): UseQuotaResult {
   const context = useContext(QuotaContext);
   if (context === undefined) {
@@ -15,7 +15,9 @@ export function useQuota(
   const { setUserIdAndProductName, ...restContext } = context;
 
   useEffect(() => {
-    setUserIdAndProductName(initialUserId, initialProductName);
+    if (initialUserId && initialProductName) {
+      setUserIdAndProductName(initialUserId, initialProductName);
+    }
   }, [initialUserId, initialProductName, setUserIdAndProductName]);
 
   return restContext;

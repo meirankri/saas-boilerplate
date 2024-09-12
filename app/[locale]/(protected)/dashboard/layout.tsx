@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { getCurrentUser } from "@/lib/lucia";
-import { SessionProvider } from "@/providers/SessionProvider";
-import { QuotaProvider } from "@/providers/QuotaProvider";
 import ConnectedHeader from "@/components/Header/ConnectedHeader";
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -19,7 +17,10 @@ export default async function RootLayout({
   if (!user) {
     return redirect("/sign-in");
   }
-  return <QuotaProvider>
+  return (
+    <>
       <ConnectedHeader />
-    {children}</QuotaProvider>;
+      {children}
+    </>
+  );
 }

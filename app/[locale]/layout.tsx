@@ -7,6 +7,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { getCurrentUser } from "@/lib/lucia";
 import { SessionProvider } from "@/providers/SessionProvider";
+import { QuotaProvider } from "@/providers/QuotaProvider";
 import SessionUpdater from "@/components/auth/SessionUpdater";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -33,7 +34,7 @@ export default async function LocaleLayout({
           <ThemeProvider>
             <SessionProvider value={user || {}}>
               <SessionUpdater />
-              {children}
+              <QuotaProvider>{children}</QuotaProvider>
               <Toaster />
             </SessionProvider>
           </ThemeProvider>

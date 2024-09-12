@@ -35,6 +35,14 @@ export interface QuotaInfo {
   remaining: number;
   total: number;
   productName: string;
+  product?: {
+    name: string;
+    quota: number;
+  };
+}
+
+export interface FeatureInfo {
+  label: string;
 }
 export interface UseQuotaResult {
   userId: string | null;
@@ -44,6 +52,8 @@ export interface UseQuotaResult {
   error: string | null;
   canUseProduct: boolean;
   remaining: number;
+  features: FeatureInfo[];
+  quotas: QuotaInfo[];
   fetchQuotaInfo: () => Promise<void>;
   decrementQuota: (amount?: number) => Promise<void>;
 }

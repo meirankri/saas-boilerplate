@@ -3,9 +3,10 @@ import React, {
   createContext,
   useReducer,
   useCallback,
+  useState,
   useEffect,
 } from "react";
-import { QuotaInfo } from "@/types";
+import { QuotaInfo, FeatureInfo } from "@/types";
 import { logger } from "@/utils/logger";
 
 interface QuotaState {
@@ -16,6 +17,7 @@ interface QuotaState {
   error: string | null;
   canUseProduct: boolean;
   remaining: number;
+  products: QuotaInfo[];
 }
 
 type QuotaAction =
@@ -26,15 +28,21 @@ type QuotaAction =
     }
   | { type: "FETCH_START" }
   | { type: "FETCH_SUCCESS"; data: QuotaInfo }
-  | { type: "FETCH_ERROR"; error: string };
+  | { type: "FETCH_ERROR"; error: string }
+  | { type: "SET_PRODUCTS"; products: QuotaInfo[] }
+  | { type: "SET_FEATURES"; features: FeatureInfo[] };
 
 type QuotaContextType = QuotaState & {
   fetchQuotaInfo: () => Promise<void>;
   decrementQuota: (amount?: number) => Promise<void>;
+  updateQuota: (productName: string, remaining: number) => void;
+  quotas: QuotaInfo[];
+  features: FeatureInfo[];
   setUserIdAndProductName: (
     userId: string | null,
     productName: string | null
   ) => void;
+  fetchUserProducts: () => Promise<void>;
 };
 
 export const QuotaContext = createContext<QuotaContextType | undefined>(
@@ -45,8 +53,8 @@ async function fetchFromAPI(
   endpoint: string,
   method: string = "GET",
   body?: any
-): Promise<QuotaInfo> {
-  const response = await fetch(`/api/quotas/${endpoint}`, {
+): Promise<any> {
+  const response = await fetch(`/api/${endpoint}`, {
     method,
     headers: {
       "Content-Type": "application/json",
@@ -81,12 +89,17 @@ function quotaReducer(state: QuotaState, action: QuotaAction): QuotaState {
       };
     case "FETCH_ERROR":
       return { ...state, isLoading: false, error: action.error };
+    case "SET_PRODUCTS":
+      return { ...state, products: action.products };
     default:
       return state;
   }
 }
 
 export function QuotaProvider({ children }: { children: React.ReactNode }) {
+  const [quotas, setQuotas] = useState<QuotaInfo[]>([]);
+  const [features, setFeatures] = useState<FeatureInfo[]>([]);
+
   const [state, dispatch] = useReducer(quotaReducer, {
     userId: null,
     productName: null,
@@ -95,7 +108,41 @@ export function QuotaProvider({ children }: { children: React.ReactNode }) {
     error: null,
     canUseProduct: false,
     remaining: 0,
+    products: [],
   });
+
+  const fetchUserProducts = useCallback(async () => {
+    try {
+      const data = await fetchFromAPI(`user-data`);
+      dispatch({ type: "SET_PRODUCTS", products: data.products });
+      dispatch({ type: "SET_FEATURES", features: data.features });
+      setQuotas(data.quotas);
+      setFeatures(data.features);
+    } catch (err) {
+      logger({
+        message: "Failed to fetch user products",
+        context: err,
+      });
+    }
+  }, []);
+
+  const updateQuota = useCallback((productName: string, remaining: number) => {
+    setQuotas((prevQuotas) =>
+      prevQuotas.map((quota) =>
+        quota.product.name === productName ? { ...quota, remaining } : quota
+      )
+    );
+  }, []);
+
+  useEffect(() => {
+    if (state.userId) {
+      fetchUserProducts();
+    }
+  }, [state.userId, fetchUserProducts]);
+
+  useEffect(() => {
+    updateQuota(state.productName, state.remaining);
+  }, [updateQuota, state.productName, state.remaining]);
 
   const setUserIdAndProductName = useCallback(
     (userId: string | null, productName: string | null) => {
@@ -132,12 +179,13 @@ export function QuotaProvider({ children }: { children: React.ReactNode }) {
       dispatch({ type: "FETCH_START" });
 
       try {
-        const data = await fetchFromAPI("decrement", "POST", {
+        const data = await fetchFromAPI("quotas/decrement", "POST", {
           userId: state.userId,
           productName: state.productName,
           amount,
         });
         dispatch({ type: "FETCH_SUCCESS", data });
+        await fetchUserProducts(); 
       } catch (err) {
         logger({
           message: "Failed to decrement quota",
@@ -150,7 +198,7 @@ export function QuotaProvider({ children }: { children: React.ReactNode }) {
         });
       }
     },
-    [state.userId, state.productName, state.remaining]
+    [state.userId, state.productName, state.remaining, fetchUserProducts]
   );
 
   useEffect(() => {
@@ -162,8 +210,12 @@ export function QuotaProvider({ children }: { children: React.ReactNode }) {
   const value: QuotaContextType = {
     ...state,
     fetchQuotaInfo,
+    quotas,
+    features,
+    updateQuota,
     decrementQuota,
     setUserIdAndProductName,
+    fetchUserProducts,
   };
 
   return (
