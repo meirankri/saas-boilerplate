@@ -2,11 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "../../styles/index.css";
 import { Toaster } from "@/components/ui/toaster";
-import Header from "@/components/Header";
 import { Providers as ThemeProvider } from "@/providers/ThemeProvider";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
-import Footer from "@/components/Footer";
 import { getCurrentUser } from "@/lib/lucia";
 import { SessionProvider } from "@/providers/SessionProvider";
 import SessionUpdater from "@/components/auth/SessionUpdater";
@@ -35,10 +33,8 @@ export default async function LocaleLayout({
           <ThemeProvider>
             <SessionProvider value={user || {}}>
               <SessionUpdater />
-              <Header />
               {children}
               <Toaster />
-              <Footer />
             </SessionProvider>
           </ThemeProvider>
         </NextIntlClientProvider>

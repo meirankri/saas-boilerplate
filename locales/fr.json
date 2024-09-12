@@ -6,6 +6,10 @@
         "title": "Meilleur SaaS Boilerplate",
         "description": "Démarrez votre prochain projet SaaS en quelques minutes"
     },
+    "UserQuotaFeatures": {
+        "quotas": "Quotas",
+        "features": "Fonctionnalités"
+    },
     "QuotaCheck": {
         "exceeded": "Quota dépassé pour {productName}",
         "connexionError": "Veuillez vous connecter pour vérifier les quotas.",

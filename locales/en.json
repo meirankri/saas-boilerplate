@@ -6,6 +6,10 @@
         "title": "Best SaaS Boiler",
         "description": "Start your next SaaS project in minutes"
     },
+    "UserQuotaFeatures": {
+        "quotas": "Quotas",
+        "features": "Features"
+    },
     "QuotaCheck": {
         "exceeded": "Quota exceeded for {productName}",
         "connexionError": "Please login to check quotas.",
