@@ -74,7 +74,7 @@ export const createGoogleAuthorizationURL = async () => {
 
 export const createGithubAuthorizationURL = async () => {
   try {
-    const state = generateState(); // generate a random string 6 characters long
+    const state = generateState();
 
     cookies().set("state", state, {
       httpOnly: true,

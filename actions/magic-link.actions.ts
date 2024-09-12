@@ -48,7 +48,6 @@ export const signIn = async (values: z.infer<typeof SignInSchema>) => {
         html: `<div>click to sign up ${res.data.url}</div>`,
       });
     } else {
-      // we will create the user
       const userId = generateId(15);
 
       await db.user.create({

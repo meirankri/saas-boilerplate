@@ -1,4 +1,4 @@
-import { addMonths as dfAddMonths, isBefore as dfIsBefore } from "date-fns"; // Importez une bibliothèque de gestion des dates
+import { addMonths as dfAddMonths, isBefore as dfIsBefore } from "date-fns";
 
 export function addMonths(date: Date, months: number): Date {
   return dfAddMonths(date, months);

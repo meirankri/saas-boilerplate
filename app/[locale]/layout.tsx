@@ -9,7 +9,6 @@ import { getMessages } from "next-intl/server";
 import Footer from "@/components/Footer";
 import { getCurrentUser } from "@/lib/lucia";
 import { SessionProvider } from "@/providers/SessionProvider";
-import { updateSessionCookie } from "@/actions/auth.actions";
 import SessionUpdater from "@/components/auth/SessionUpdater";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -28,9 +27,6 @@ export default async function LocaleLayout({
 }>) {
   const messages = await getMessages({ locale });
   const user = (await getCurrentUser()) || {};
-
-  // Supprimez cette ligne
-  // await updateSessionCookie();
 
   return (
     <html lang={locale}>

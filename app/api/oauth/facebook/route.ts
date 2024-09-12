@@ -66,7 +66,7 @@ export const GET = async (req: NextRequest) => {
           await trx.oauthAccount.create({
             data: {
               accessToken,
-              id: generateId(15), // Assuming you have this function
+              id: generateId(15),
               provider: "facebook",
               providerUserId: facebookData.id,
               userId,

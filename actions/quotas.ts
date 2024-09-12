@@ -1,8 +1,8 @@
 import { db } from "@/lib/database/db";
 import prisma from "@/prisma/prismaClient";
 import { Product, Subscription, User } from "@prisma/client";
-import { addMonths, isBefore } from "@/utils/date"; // Importez les fonctions de gestion des dates
-import { logger } from "@/utils/logger"; // Importez le logger
+import { addMonths, isBefore } from "@/utils/date";
+import { logger } from "@/utils/logger";
 
 export class QuotaService {
   async getQuotaInfo(userId: string, productName: string) {
