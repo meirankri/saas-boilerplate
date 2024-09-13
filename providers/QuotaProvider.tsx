@@ -114,6 +114,7 @@ export function QuotaProvider({ children }: { children: React.ReactNode }) {
   const fetchUserProducts = useCallback(async () => {
     try {
       const data = await fetchFromAPI(`user-data`);
+      console.log("data", data);
       dispatch({ type: "SET_PRODUCTS", products: data.products });
       dispatch({ type: "SET_FEATURES", features: data.features });
       setQuotas(data.quotas);
@@ -177,7 +178,7 @@ export function QuotaProvider({ children }: { children: React.ReactNode }) {
       dispatch({ type: "FETCH_START" });
 
       try {
-        const data = await fetchFromAPI("quotas/decrement", "POST", {
+        const data = await fetchFromAPI("decrement", "POST", {
           userId: state.userId,
           productName: state.productName,
           amount,
