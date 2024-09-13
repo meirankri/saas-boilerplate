@@ -47,65 +47,77 @@ export const oauthUpsertUser = async (
   refreshToken: string | undefined
 ): Promise<string> => {
   try {
-    let newUser: User;
     let user: User & {
       oauthAccounts: OauthAccount[];
     };
     await db.$transaction(async (trx) => {
-      user = await trx.user.findFirst({
+      const existingUser = await trx.user.findFirst({
         where: { email: userData.email },
         include: { oauthAccounts: true },
       });
-      if (!user) {
-        newUser = await trx.user.create({
+
+      if (!existingUser) {
+        const newUser = await trx.user.create({
           data: {
             id: userData.id,
             email: userData.email,
             name: userData.name,
             profilePictureUrl: userData.picture,
+            oauthAccounts: {
+              create: {
+                provider: "google",
+                providerUserId: userData.id,
+                accessToken,
+                expiresAt: accessTokenExpiresAt,
+                refreshToken,
+              },
+            },
           },
+          include: { oauthAccounts: true },
         });
-
+        user = newUser;
         await addFreeTrialSubscription(trx, newUser.id);
-      }
-
-      if (user.oauthAccounts.length > 0) {
-        const [oauthAccount] = user.oauthAccounts;
-        await updateOAuthAccount(
-          trx,
-          oauthAccount.id,
-          accessToken,
-          accessTokenExpiresAt,
-          refreshToken
-        );
       } else {
-        await createOAuthAccount(
-          trx,
-          user.id,
-          userData.id,
-          accessToken,
-          accessTokenExpiresAt,
-          refreshToken
-        );
+        user = existingUser;
+        if (user.oauthAccounts.length > 0) {
+          const [oauthAccount] = user.oauthAccounts;
+          await updateOAuthAccount(
+            trx,
+            oauthAccount.id,
+            accessToken,
+            accessTokenExpiresAt,
+            refreshToken
+          );
+        } else {
+          await createOAuthAccount(
+            trx,
+            user.id,
+            userData.id,
+            accessToken,
+            accessTokenExpiresAt,
+            refreshToken
+          );
+        }
       }
 
-      await trx.user.update({
+      user = await trx.user.update({
         where: { id: user.id },
         data: {
           name: user.name || userData.name,
           profilePictureUrl: userData.picture,
         },
+        include: { oauthAccounts: true },
       });
     });
-    return newUser?.id || user.id;
+    return user.id;
   } catch (error) {
     logger({
       message: "Error during OAuth user upsert",
       context: error,
     }).error();
+    throw error;
   }
 };
-
 async function createOAuthAccount(
   trx: any,
   userId: string,

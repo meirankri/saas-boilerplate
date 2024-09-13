@@ -52,7 +52,7 @@ async function createSessionAndSetCookies(userId: string) {
     expiresIn: 60 * 60 * 24 * 30,
   });
   const sessionCookie = lucia.createSessionCookie(session.id);
-  const cookieHeader = cookies(); 
+  const cookieHeader = cookies();
 
   cookieHeader.set(
     sessionCookie.name,
