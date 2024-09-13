@@ -54,7 +54,7 @@ async function fetchFromAPI(
   method: string = "GET",
   body?: any
 ): Promise<any> {
-  const response = await fetch(`/api/${endpoint}`, {
+  const response = await fetch(`/api/quotas/${endpoint}`, {
     method,
     headers: {
       "Content-Type": "application/json",
