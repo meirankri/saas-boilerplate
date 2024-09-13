@@ -63,7 +63,10 @@ async function fetchFromAPI(
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch: ${response.statusText}`);
+    logger({
+      message: "Failed to fetch from API",
+      context: response,
+    }).error();
   }
 
   return await response.json();
