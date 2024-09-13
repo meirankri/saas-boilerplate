@@ -135,10 +135,8 @@ export function QuotaProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (state.userId) {
-      fetchUserProducts();
-    }
-  }, [state.userId, fetchUserProducts]);
+    fetchUserProducts();
+  }, [fetchUserProducts]);
 
   useEffect(() => {
     updateQuota(state.productName, state.remaining);
@@ -185,7 +183,7 @@ export function QuotaProvider({ children }: { children: React.ReactNode }) {
           amount,
         });
         dispatch({ type: "FETCH_SUCCESS", data });
-        await fetchUserProducts(); 
+        await fetchUserProducts();
       } catch (err) {
         logger({
           message: "Failed to decrement quota",
