@@ -8,6 +8,8 @@ import React, {
 } from "react";
 import { QuotaInfo, FeatureInfo } from "@/types";
 import { logger } from "@/utils/logger";
+import { useSession } from "@/hooks/useSession";
+import { isEmpty } from "@/utils/checker";
 
 interface QuotaState {
   userId: string | null;
@@ -114,7 +116,13 @@ export function QuotaProvider({ children }: { children: React.ReactNode }) {
     products: [],
   });
 
+  const session = useSession();
+
   const fetchUserProducts = useCallback(async () => {
+    if (isEmpty(session)) {
+      return;
+    }
+
     try {
       const data = await fetchFromAPI(`user-data`);
 
@@ -124,11 +132,17 @@ export function QuotaProvider({ children }: { children: React.ReactNode }) {
       setFeatures(data.features);
     } catch (err) {
       logger({
-        message: "Failed to fetch user products",
+        message: "Échec de la récupération des produits de l'utilisateur",
         context: err,
       });
     }
-  }, []);
+  }, [session]);
+
+  useEffect(() => {
+    if (!isEmpty(session)) {
+      fetchUserProducts();
+    }
+  }, [fetchUserProducts, session]);
 
   const updateQuota = useCallback((productName: string, remaining: number) => {
     setQuotas((prevQuotas) =>
@@ -137,10 +151,6 @@ export function QuotaProvider({ children }: { children: React.ReactNode }) {
       )
     );
   }, []);
-
-  useEffect(() => {
-    fetchUserProducts();
-  }, [fetchUserProducts]);
 
   useEffect(() => {
     updateQuota(state.productName, state.remaining);
