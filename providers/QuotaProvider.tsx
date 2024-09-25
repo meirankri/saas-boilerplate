@@ -117,7 +117,7 @@ export function QuotaProvider({ children }: { children: React.ReactNode }) {
   const fetchUserProducts = useCallback(async () => {
     try {
       const data = await fetchFromAPI(`user-data`);
-      console.log("data", data);
+
       dispatch({ type: "SET_PRODUCTS", products: data.products });
       dispatch({ type: "SET_FEATURES", features: data.features });
       setQuotas(data.quotas);

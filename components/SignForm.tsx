@@ -26,6 +26,8 @@ import { useRouter } from "next/navigation";
 import SignUpGoogle from "./Buttons/SIgnUpGoogle";
 import SignUpGithub from "./Buttons/SignUpGithub";
 import SignUpFacebook from "./Buttons/SignUpFacebook";
+import env from '@/lib/env';
+
 
 export function SignForm() {
   const router = useRouter();
@@ -96,17 +98,23 @@ export function SignForm() {
 
   return (
     <>
-      <div className="w-full flex item-center justify-center">
-        <SignUpGithub onClick={onGithubSignInClicked} />
-      </div>
+      {env.NEXT_PUBLIC_GOOGLE_AUTH === "true" && (
+        <div className="w-full flex item-center justify-center">
+          <SignUpGoogle onClick={onGoogleSignInClicked} />
+        </div>
+      )}
 
-      <div className="w-full flex item-center justify-center">
-        <SignUpGoogle onClick={onGoogleSignInClicked} />
-      </div>
+      {env.NEXT_PUBLIC_GITHUB_AUTH === "true" && (
+        <div className="w-full flex item-center justify-center">
+          <SignUpGithub onClick={onGithubSignInClicked} />
+        </div>
+      )}
 
-      <div className="w-full flex item-center justify-center">
-        <SignUpFacebook onClick={onFacebookSignInClicked} />
-      </div>
+      {env.NEXT_PUBLIC_FACEBOOK_AUTH === "true" && (
+        <div className="w-full flex item-center justify-center">
+          <SignUpFacebook onClick={onFacebookSignInClicked} />
+        </div>
+      )}
 
       <div className="mb-8 flex items-center justify-center">
         <span className="hidden h-[1px] w-full max-w-[70px] bg-body-color/50 sm:block"></span>
