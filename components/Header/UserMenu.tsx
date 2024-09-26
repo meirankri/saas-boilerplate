@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { useRouter } from "next/navigation";
 
 import { useSession } from "@/hooks/useSession";
 import { signOut } from "@/actions/auth.actions";
@@ -9,6 +10,12 @@ import UserQuotaFeatures from "@/components/quota/UserQuotaFeatures";
 
 const UserMenu = () => {
   const user = useSession() as ExtendedUser;
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push("/");
+  };
 
   return (
     <Menu as="div" className="relative ml-3">
@@ -37,7 +44,7 @@ const UserMenu = () => {
         className="absolute min-w-56 dark:bg-dark right-0 z-10 mt-2  origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
       >
         <MenuItem>
-          <form action={signOut}>
+          <form action={handleSignOut}>
             <button
               type="submit"
               className="block w-full text-center rounded py-2.5 text-sm text-dark hover:text-primary dark:text-white/70 dark:hover:text-white lg:px-3"

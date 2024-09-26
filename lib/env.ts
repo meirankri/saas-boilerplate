@@ -2,9 +2,18 @@ import { z } from "zod";
 
 const envSchema = z.object({
   // Variables d'authentification sociale
-  NEXT_PUBLIC_GOOGLE_AUTH: z.enum(["true", "false"]).optional().default("false"),
-  NEXT_PUBLIC_GITHUB_AUTH: z.enum(["true", "false"]).optional().default("false"),
-  NEXT_PUBLIC_FACEBOOK_AUTH: z.enum(["true", "false"]).optional().default("false"),
+  NEXT_PUBLIC_GOOGLE_AUTH: z
+    .enum(["true", "false"])
+    .optional()
+    .default("false"),
+  NEXT_PUBLIC_GITHUB_AUTH: z
+    .enum(["true", "false"])
+    .optional()
+    .default("false"),
+  NEXT_PUBLIC_FACEBOOK_AUTH: z
+    .enum(["true", "false"])
+    .optional()
+    .default("false"),
 
   // Identifiants Google
   GOOGLE_CLIENT_ID: z.string().optional(),
@@ -52,7 +61,9 @@ const processEnv = {
   EMAIL_SERVER_USER: process.env.EMAIL_SERVER_USER,
   EMAIL_SERVER_PASSWORD: process.env.EMAIL_SERVER_PASSWORD,
   EMAIL_SERVER_HOST: process.env.EMAIL_SERVER_HOST,
-  EMAIL_SERVER_PORT: process.env.EMAIL_SERVER_PORT ? parseInt(process.env.EMAIL_SERVER_PORT, 10) : undefined,
+  EMAIL_SERVER_PORT: process.env.EMAIL_SERVER_PORT
+    ? parseInt(process.env.EMAIL_SERVER_PORT, 10)
+    : undefined,
   EMAIL_FROM: process.env.EMAIL_FROM,
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
   STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,

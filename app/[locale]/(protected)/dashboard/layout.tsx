@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 
-import { getCurrentUser } from "@/lib/lucia";
 import ConnectedHeader from "@/components/Header/ConnectedHeader";
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -12,11 +10,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    return redirect("/sign-in");
-  }
   return (
     <>
       <ConnectedHeader />

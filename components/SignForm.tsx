@@ -26,8 +26,7 @@ import { useRouter } from "next/navigation";
 import SignUpGoogle from "./Buttons/SIgnUpGoogle";
 import SignUpGithub from "./Buttons/SignUpGithub";
 import SignUpFacebook from "./Buttons/SignUpFacebook";
-import env from '@/lib/env';
-
+import env from "@/lib/env";
 
 export function SignForm() {
   const router = useRouter();
@@ -53,7 +52,7 @@ export function SignForm() {
         description: res.message,
       });
 
-      router.push("/dashboard");
+      router.push("/");
     }
   }
 

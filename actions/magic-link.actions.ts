@@ -48,24 +48,21 @@ export const signIn = async (values: z.infer<typeof SignInSchema>) => {
         html: `<div>click to sign up ${res.data.url}</div>`,
       });
     } else {
-      const userId = generateId(15);
-
-      await db.user.create({
+      const user = await db.user.create({
         data: {
           email: values.email,
-          id: userId,
         },
       });
-      const res = await generateMagicLink(values.email, userId);
+      const res = await generateMagicLink(values.email, user.id);
 
       await db.magicLink.create({
         data: {
-          userId,
+          userId: user.id,
           token: res.data.token,
         },
       });
 
-      await addFreeTrialSubscription(db, userId);
+      await addFreeTrialSubscription(db, user.id);
 
       await sendEmail({
         to: values.email,
