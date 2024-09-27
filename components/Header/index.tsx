@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 import ThemeToggler from "./ThemeToggler";
 import menuData from "./menuData";
@@ -11,6 +12,7 @@ import UserMenu from "./UserMenu";
 import { isEmpty } from "@/utils/checker";
 
 const Header = () => {
+  const t = useTranslations("UserMenu");
   const [navbarOpen, setNavbarOpen] = useState(false);
   const user = useSession();
   const navbarToggleHandler = () => {
@@ -79,7 +81,7 @@ const Header = () => {
                 <button
                   onClick={navbarToggleHandler}
                   id="navbarToggler"
-                  aria-label="Mobile Menu"
+                  aria-label="mobile Menu"
                   className="absolute right-4 top-1/2 block translate-y-[-50%] rounded-lg px-3 py-[6px] ring-primary focus:ring-2 lg:hidden"
                 >
                   <span
@@ -121,7 +123,7 @@ const Header = () => {
                                     : "text-dark hover:text-primary dark:text-white/70 dark:hover:text-white"
                                 }`}
                               >
-                                {menuItem.title}
+                                {t(menuItem.title)}
                               </Link>
                             ) : (
                               <>
@@ -129,7 +131,7 @@ const Header = () => {
                                   onClick={() => handleSubmenu(index)}
                                   className="flex cursor-pointer items-center justify-between py-2 text-base text-dark group-hover:text-primary dark:text-white/70 dark:group-hover:text-white lg:mr-0 lg:inline-flex lg:px-0 lg:py-6"
                                 >
-                                  {menuItem.title}
+                                  {t(menuItem.title)}
                                   <span className="pl-3">
                                     <svg
                                       width="25"
@@ -157,7 +159,7 @@ const Header = () => {
                                         key={index}
                                         className="block rounded py-2.5 text-sm text-dark hover:text-primary dark:text-white/70 dark:hover:text-white lg:px-3"
                                       >
-                                        {submenuItem.title}
+                                        {t(submenuItem.title)}
                                       </Link>
                                     )
                                   )}
@@ -172,7 +174,7 @@ const Header = () => {
                         href="/sign-in"
                         className="submenu relative left-0 top-full rounded-sm bg-white transition-[top] duration-300 group-hover:opacity-100 dark:bg-dark lg:invisible lg:absolute lg:top-[110%] lg:block lg:w-[250px] lg:p-4 lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full"
                       >
-                        Sign In
+                        {t("signIn")}
                       </Link>
                     )}
                   </ul>
@@ -184,7 +186,7 @@ const Header = () => {
                     href="/sign-in"
                     className="hidden bg-primary px-7 py-3 text-base font-medium text-dark hover:opacity-70 dark:text-white lg:block"
                   >
-                    Sign In
+                    {t("signIn")}
                   </Link>
                 )}
                 <div>

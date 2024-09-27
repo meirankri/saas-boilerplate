@@ -6,6 +6,26 @@
         "title": "Best SaaS Boiler",
         "description": "Start your next SaaS project in minutes"
     },
+    "SignForm": {
+        "title": "Sign in to your account",
+        "orSignInWithEmail": "Or, sign in with your email",
+        "email": "Email",
+        "emailPlaceholder": "Email",
+        "loading": "Loading...",
+        "signIn": "Sign in",
+        "googleSignIn": "Sign in with Google",
+        "facebookSignIn": "Sign in with Facebook",
+        "githubSignIn": "Sign in with Github",
+        "description": "Login to your account for a faster checkout."
+    },
+    "UserMenu": {
+        "signOut": "Sign out",
+        "billing": "Billing",
+        "signIn": "Sign in",
+        "home": "Home",
+        "dashboard": "Dashboard",
+        "pricing": "Pricing"
+    },
     "UserQuotaFeatures": {
         "quotas": "Quotas",
         "features": "Features",

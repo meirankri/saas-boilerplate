@@ -1,8 +1,11 @@
+import { useTranslations } from "next-intl";
+
 interface SignUpGoogleProps {
   onClick: () => void;
 }
 
-const SignUpGoogle: React.FC<SignUpGoogleProps> = ({ onClick }) => {
+const SignUpGoogle: React.FC<SignUpGoogleProps> = async ({ onClick }) => {
+  const t = useTranslations("SignForm");
   return (
     <button
       onClick={onClick}
@@ -41,7 +44,7 @@ const SignUpGoogle: React.FC<SignUpGoogleProps> = ({ onClick }) => {
           </defs>
         </svg>
       </span>
-      Sign in with Google
+      {t("googleSignIn")}
     </button>
   );
 };

@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { useSession } from "@/hooks/useSession";
 import { signOut } from "@/actions/auth.actions";
@@ -9,6 +10,7 @@ import { ExtendedUser } from "@/types";
 import UserQuotaFeatures from "@/components/quota/UserQuotaFeatures";
 
 const UserMenu = () => {
+  const t = useTranslations("UserMenu");
   const user = useSession() as ExtendedUser;
   const router = useRouter();
 
@@ -27,7 +29,7 @@ const UserMenu = () => {
             <Image
               width={32}
               height={32}
-              alt=""
+              alt="picture profile"
               src={user.profilePictureUrl}
               className="h-8 w-8 rounded-full"
             />
@@ -49,7 +51,7 @@ const UserMenu = () => {
               type="submit"
               className="block w-full text-center rounded py-2.5 text-sm text-dark hover:text-primary dark:text-white/70 dark:hover:text-white lg:px-3"
             >
-              Sign out
+              {t("signOut")}
             </button>
           </form>
         </MenuItem>
@@ -61,7 +63,7 @@ const UserMenu = () => {
               target="_blank"
               className="block w-full text-center rounded py-2.5 text-sm text-dark hover:text-primary dark:text-white/70 dark:hover:text-white lg:px-3"
             >
-              Billing
+              {t("billing")}
             </a>
           </MenuItem>
         )}

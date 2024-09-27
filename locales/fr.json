@@ -6,6 +6,26 @@
         "title": "Meilleur SaaS Boilerplate",
         "description": "Démarrez votre prochain projet SaaS en quelques minutes"
     },
+    "SignForm": {
+        "title": "Connectez-vous à votre compte",
+        "orSignInWithEmail": "Ou, connectez-vous avec votre email",
+        "email": "Email",
+        "emailPlaceholder": "Email",
+        "loading": "Chargement...",
+        "signIn": "Se connecter",
+        "googleSignIn": "Se connecter avec Google",
+        "facebookSignIn": "Se connecter avec Facebook",
+        "githubSignIn": "Se connecter avec Github",
+        "description": "Connectez-vous à votre compte pour un checkout plus rapide."
+    },
+    "UserMenu": {
+        "signOut": "Se déconnecter",
+        "billing": "Facturation",
+        "signIn": "Se connecter",
+        "home": "Accueil",
+        "dashboard": "Tableau de bord",
+        "pricing": "Tarifs"
+    },
     "UserQuotaFeatures": {
         "quotas": "Quotas",
         "features": "Fonctionnalités",

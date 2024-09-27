@@ -1,8 +1,11 @@
+import { useTranslations } from "next-intl";
+
 interface SignUpFacebookProps {
   onClick: () => void;
 }
 
 const SignUpFacebook: React.FC<SignUpFacebookProps> = ({ onClick }) => {
+  const t = useTranslations("SignForm");
   return (
     <button
       onClick={onClick}
@@ -22,7 +25,7 @@ const SignUpFacebook: React.FC<SignUpFacebookProps> = ({ onClick }) => {
           />
         </svg>
       </span>
-      Sign in with Facebook
+      {t("facebookSignIn")}
     </button>
   );
 };

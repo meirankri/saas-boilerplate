@@ -1,12 +1,13 @@
 import nodemailer from "nodemailer";
+import env from "./env";
 
 const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_SERVER_HOST,
-  port: Number(process.env.EMAIL_SERVER_PORT),
+  host: env.EMAIL_SERVER_HOST,
+  port: Number(env.EMAIL_SERVER_PORT),
   secure: true,
   auth: {
-    user: process.env.EMAIL_SERVER_USER,
-    pass: process.env.EMAIL_SERVER_PASSWORD,
+    user: env.EMAIL_SERVER_USER,
+    pass: env.EMAIL_SERVER_PASSWORD,
   },
 });
 
@@ -20,7 +21,7 @@ export async function sendEmail({
   html: string;
 }) {
   await transporter.sendMail({
-    from: `"your name" <${process.env.EMAIL_SERVER_USER}>`,
+    from: `"your name" <${env.EMAIL_FROM}>`,
     to,
     subject,
     html,
