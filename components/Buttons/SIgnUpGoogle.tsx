@@ -4,7 +4,7 @@ interface SignUpGoogleProps {
   onClick: () => void;
 }
 
-const SignUpGoogle: React.FC<SignUpGoogleProps> = async ({ onClick }) => {
+const SignUpGoogle: React.FC<SignUpGoogleProps> = ({ onClick }) => {
   const t = useTranslations("SignForm");
   return (
     <button
