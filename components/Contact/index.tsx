@@ -1,6 +1,89 @@
+"use client";
+
+import { useState } from "react";
 import NewsLatterBox from "./NewsLatterBox";
+import env from "@/lib/env";
+import { logger } from "@/utils/logger";
 
 const Contact = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(
+    null
+  );
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setSubmitStatus(null);
+    let recaptchaData = null;
+    try {
+      const token = await new Promise<string>((resolve) => {
+        if (typeof window !== "undefined" && window.grecaptcha) {
+          window.grecaptcha.ready(() => {
+            window.grecaptcha
+              .execute(env.NEXT_PUBLIC_GOOGLE_RECAPTCHA_KEY, {
+                action: "submit",
+              })
+              .then(resolve);
+          });
+        }
+      });
+
+      const recaptchaResponse = await fetch("/api/verify-recaptcha", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token }),
+      });
+
+      recaptchaData = await recaptchaResponse.json();
+    } catch (error) {
+      logger({
+        message: "Server error during reCAPTCHA verification",
+        context: error,
+      }).error();
+    }
+
+    if (recaptchaData.success) {
+      try {
+        const response = await fetch("/api/contact", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+        if (response.ok) {
+          setFormData({ name: "", email: "", message: "" });
+          setSubmitStatus("success");
+        } else {
+          setSubmitStatus("error");
+        }
+      } catch (error) {
+        logger({
+          message: "Server error during contact form submission",
+          context: error,
+        }).error();
+        setSubmitStatus("error");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
   return (
     <section id="contact" className="overflow-hidden py-16 md:py-20 lg:py-28">
       <div className="container">
@@ -17,7 +100,13 @@ const Contact = () => {
               <p className="mb-12 text-base font-medium text-body-color">
                 Our support team will get back to you ASAP via email.
               </p>
-              <form>
+              {submitStatus === "success" && (
+                <p className="mb-4 text-green-600">Message sended</p>
+              )}
+              {submitStatus === "error" && (
+                <p className="mb-4 text-red-600">Error sending message</p>
+              )}
+              <form onSubmit={handleSubmit}>
                 <div className="-mx-4 flex flex-wrap">
                   <div className="w-full px-4 md:w-1/2">
                     <div className="mb-8">
@@ -29,6 +118,9 @@ const Contact = () => {
                       </label>
                       <input
                         type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
                         placeholder="Enter your name"
                         className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-sm border bg-[#f8f8f8] px-6 py-3 text-base text-body-color outline-none focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
                       />
@@ -44,6 +136,9 @@ const Contact = () => {
                       </label>
                       <input
                         type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
                         placeholder="Enter your email"
                         className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-sm border bg-[#f8f8f8] px-6 py-3 text-base text-body-color outline-none focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
                       />
@@ -59,6 +154,8 @@ const Contact = () => {
                       </label>
                       <textarea
                         name="message"
+                        value={formData.message}
+                        onChange={handleChange}
                         rows={5}
                         placeholder="Enter your Message"
                         className="border-stroke dark:text-body-color-dark dark:shadow-two w-full resize-none rounded-sm border bg-[#f8f8f8] px-6 py-3 text-base text-body-color outline-none focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
@@ -66,8 +163,11 @@ const Contact = () => {
                     </div>
                   </div>
                   <div className="w-full px-4">
-                    <button className="shadow-submit dark:shadow-submit-dark rounded-sm bg-primary px-9 py-4 text-base font-medium text-white duration-300 hover:bg-primary/90">
-                      Submit Ticket
+                    <button
+                      disabled={isLoading}
+                      className="shadow-submit dark:shadow-submit-dark rounded-sm bg-primary px-9 py-4 text-base font-medium text-white duration-300 hover:bg-primary/90"
+                    >
+                      {isLoading ? "Loading..." : "Submit Ticket"}
                     </button>
                   </div>
                 </div>

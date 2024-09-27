@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -12,14 +13,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-
 import { Input } from "@/components/ui/input";
 import { SignInSchema } from "../types";
-import {
-  createFacebookAuthorizationURL,
-  createGithubAuthorizationURL,
-  createGoogleAuthorizationURL,
-} from "../actions/auth.actions";
 import { signIn } from "@/actions/magic-link.actions";
 import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
@@ -27,9 +22,12 @@ import SignUpGoogle from "./Buttons/SIgnUpGoogle";
 import SignUpGithub from "./Buttons/SignUpGithub";
 import SignUpFacebook from "./Buttons/SignUpFacebook";
 import env from "@/lib/env";
-import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { createGoogleAuthorizationURL } from "@/actions/auth.actions";
+import { createFacebookAuthorizationURL } from "@/actions/auth.actions";
+import { createGithubAuthorizationURL } from "@/actions/auth.actions";
+import { logger } from "@/utils/logger";
 
 export function SignForm() {
   const router = useRouter();
@@ -46,6 +44,47 @@ export function SignForm() {
   async function onSubmit(values: z.infer<typeof SignInSchema>) {
     setIsLoading(true);
     try {
+      const token = await new Promise<string>((resolve) => {
+        if (typeof window !== "undefined" && window.grecaptcha) {
+          window.grecaptcha.ready(() => {
+            window.grecaptcha
+              .execute(env.NEXT_PUBLIC_GOOGLE_RECAPTCHA_KEY, {
+                action: "login",
+              })
+              .then(resolve);
+          });
+        } else {
+          logger({
+            message: "reCAPTCHA is not loaded",
+          }).error();
+          resolve("");
+        }
+      });
+
+      if (!token) {
+        toast({
+          variant: "destructive",
+          description: "Unable to verify reCAPTCHA. Please try again.",
+        });
+        return;
+      }
+
+      const recaptchaResponse = await fetch("/api/verify-recaptcha", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token }),
+      });
+
+      const recaptchaData = await recaptchaResponse.json();
+
+      if (!recaptchaData.success) {
+        toast({
+          variant: "destructive",
+          description: "reCAPTCHA verification failed. Please try again.",
+        });
+        return;
+      }
+
       const res = await signIn(values);
 
       if (!res.success) {
@@ -61,6 +100,15 @@ export function SignForm() {
 
         router.push("/");
       }
+    } catch (error) {
+      logger({
+        message: "Error during sign in",
+        context: error,
+      }).error();
+      toast({
+        variant: "destructive",
+        description: "An error occurred. Please try again.",
+      });
     } finally {
       setIsLoading(false);
     }

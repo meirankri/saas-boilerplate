@@ -43,6 +43,9 @@ const envSchema = z.object({
   STRIPE_SECRET_KEY: z.string().optional(),
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
   NEXT_PUBLIC_STRIPE_BILLING_URL: z.string().url().optional(),
+
+  NEXT_PUBLIC_GOOGLE_RECAPTCHA_KEY: z.string().optional(),
+  RECAPTCHA_SECRET_KEY: z.string().optional(),
 });
 
 const processEnv = {
@@ -68,6 +71,9 @@ const processEnv = {
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
   STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
   NEXT_PUBLIC_STRIPE_BILLING_URL: process.env.NEXT_PUBLIC_STRIPE_BILLING_URL,
+  NEXT_PUBLIC_GOOGLE_RECAPTCHA_KEY:
+    process.env.NEXT_PUBLIC_GOOGLE_RECAPTCHA_KEY,
+  RECAPTCHA_SECRET_KEY: process.env.RECAPTCHA_SECRET_KEY,
 };
 
 const env = envSchema.parse(processEnv);

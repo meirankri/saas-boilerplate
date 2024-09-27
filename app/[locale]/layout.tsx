@@ -9,6 +9,8 @@ import { getCurrentUser } from "@/lib/lucia";
 import { SessionProvider } from "@/providers/SessionProvider";
 import { QuotaProvider } from "@/providers/QuotaProvider";
 import SessionUpdater from "@/components/auth/SessionUpdater";
+import Script from "next/script";
+import env from "@/lib/env";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -39,6 +41,10 @@ export default async function LocaleLayout({
             </SessionProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
+        <Script
+          src={`https://www.google.com/recaptcha/api.js?render=${env.NEXT_PUBLIC_GOOGLE_RECAPTCHA_KEY}`}
+          strategy="beforeInteractive"
+        />
       </body>
     </html>
   );
