@@ -3,15 +3,15 @@ import { z } from "zod";
 const envSchema = z.object({
   // Variables d'authentification sociale
   NEXT_PUBLIC_GOOGLE_AUTH: z
-    .enum(["true", "false"])
+    .enum(["true", "false", ""])
     .optional()
     .default("false"),
   NEXT_PUBLIC_GITHUB_AUTH: z
-    .enum(["true", "false"])
+    .enum(["true", "false", ""])
     .optional()
     .default("false"),
   NEXT_PUBLIC_FACEBOOK_AUTH: z
-    .enum(["true", "false"])
+    .enum(["true", "false", ""])
     .optional()
     .default("false"),
 
@@ -30,19 +30,19 @@ const envSchema = z.object({
   // Autres variables d'environnement
   DATABASE_URL: z.string().optional(),
   JWT_SECRET: z.string().optional(),
-  NEXT_PUBLIC_BASE_URL: z.string().url().optional(),
+  NEXT_PUBLIC_BASE_URL: z.string().url().optional().or(z.literal("")),
 
   // Variables pour l'email
   EMAIL_SERVER_USER: z.string().optional(),
   EMAIL_SERVER_PASSWORD: z.string().optional(),
   EMAIL_SERVER_HOST: z.string().optional(),
   EMAIL_SERVER_PORT: z.number().int().positive().optional(),
-  EMAIL_FROM: z.string().email().optional(),
+  EMAIL_FROM: z.string().email().optional().or(z.literal("")),
 
   // Variables Stripe
   STRIPE_SECRET_KEY: z.string().optional(),
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
-  NEXT_PUBLIC_STRIPE_BILLING_URL: z.string().url().optional(),
+  NEXT_PUBLIC_STRIPE_BILLING_URL: z.string().url().optional().or(z.literal("")),
 
   NEXT_PUBLIC_GOOGLE_RECAPTCHA_KEY: z.string().optional(),
   RECAPTCHA_SECRET_KEY: z.string().optional(),
