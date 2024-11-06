@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
-import { sendEmail } from "@/lib/email";
+import { sendEmail } from "@/lib/sendGrid";
+import env from "@/lib/env";
 
 export async function POST(request: Request) {
   const { name, email, message } = await request.json();
 
   try {
     await sendEmail({
-      to: process.env.EMAIL_SERVER_USER,
+      to: env.EMAIL_FROM,
       subject: "New contact message",
       html: `
         <h1>New contact message</h1>

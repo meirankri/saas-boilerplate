@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && prisma migrate deploy && next build",    
+    "build": "prisma generate && prisma migrate deploy && next build",
     "start": "next start",
     "lint": "next lint",
     "generate": "prisma migrate dev --name",
@@ -21,6 +21,7 @@
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-toast": "^1.1.5",
+    "@sendgrid/mail": "^8.1.4",
     "arctic": "^1.2.1",
     "bcrypt": "^5.1.1",
     "class-variance-authority": "^0.7.0",

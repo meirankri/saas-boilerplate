@@ -44,45 +44,48 @@ export function SignForm() {
   async function onSubmit(values: z.infer<typeof SignInSchema>) {
     setIsLoading(true);
     try {
-      const token = await new Promise<string>((resolve) => {
-        if (typeof window !== "undefined" && window.grecaptcha) {
-          window.grecaptcha.ready(() => {
-            window.grecaptcha
-              .execute(env.NEXT_PUBLIC_GOOGLE_RECAPTCHA_KEY, {
-                action: "login",
-              })
-              .then(resolve);
+      let token: string | undefined;
+      if (env.NEXT_PUBLIC_GOOGLE_RECAPTCHA_KEY) {
+        token = await new Promise<string>((resolve) => {
+          if (typeof window !== "undefined" && window.grecaptcha) {
+            window.grecaptcha.ready(() => {
+              window.grecaptcha
+                .execute(env.NEXT_PUBLIC_GOOGLE_RECAPTCHA_KEY, {
+                  action: "login",
+                })
+                .then(resolve);
+            });
+          } else {
+            logger({
+              message: "reCAPTCHA is not loaded",
+            }).error();
+            resolve("");
+          }
+        });
+
+        if (!token) {
+          toast({
+            variant: "destructive",
+            description: "Unable to verify reCAPTCHA. Please try again.",
           });
-        } else {
-          logger({
-            message: "reCAPTCHA is not loaded",
-          }).error();
-          resolve("");
+          return;
         }
-      });
 
-      if (!token) {
-        toast({
-          variant: "destructive",
-          description: "Unable to verify reCAPTCHA. Please try again.",
+        const recaptchaResponse = await fetch("/api/verify-recaptcha", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token }),
         });
-        return;
-      }
 
-      const recaptchaResponse = await fetch("/api/verify-recaptcha", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
-      });
+        const recaptchaData = await recaptchaResponse.json();
 
-      const recaptchaData = await recaptchaResponse.json();
-
-      if (!recaptchaData.success) {
-        toast({
-          variant: "destructive",
-          description: "reCAPTCHA verification failed. Please try again.",
-        });
-        return;
+        if (!recaptchaData.success) {
+          toast({
+            variant: "destructive",
+            description: "reCAPTCHA verification failed. Please try again.",
+          });
+          return;
+        }
       }
 
       const res = await signIn(values);

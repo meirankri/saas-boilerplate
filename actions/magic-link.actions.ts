@@ -1,12 +1,12 @@
 "use server";
 import { db } from "@/lib/database/db";
 import { SignInSchema } from "@/types";
-import { generateId } from "lucia";
 import { z } from "zod";
 import jwt from "jsonwebtoken";
-import { sendEmail } from "@/lib/email";
+import { sendEmail } from "@/lib/sendGrid";
 import { logger } from "@/utils/logger";
 import { addFreeTrialSubscription } from "@/lib/lucia/auth";
+import { verifyRecaptcha } from "@/utils/recaptcha";
 
 const generateMagicLink = async (email: string, userId: string) => {
   const token = jwt.sign({ email: email, userId }, process.env.JWT_SECRET!, {
@@ -28,6 +28,15 @@ const generateMagicLink = async (email: string, userId: string) => {
 export const signIn = async (values: z.infer<typeof SignInSchema>) => {
   try {
     SignInSchema.parse(values);
+
+    const isVerified = await verifyRecaptcha();
+    if (!isVerified) {
+      return {
+        success: false,
+        message: "reCAPTCHA verification failed",
+        data: null,
+      };
+    }
 
     const existedUser = await db.user.findUnique({
       where: { email: values.email },

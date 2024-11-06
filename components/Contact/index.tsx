@@ -4,6 +4,7 @@ import { useState } from "react";
 import NewsLatterBox from "./NewsLatterBox";
 import env from "@/lib/env";
 import { logger } from "@/utils/logger";
+import { verifyRecaptcha } from "@/utils/recaptcha";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -30,35 +31,10 @@ const Contact = () => {
     e.preventDefault();
     setIsLoading(true);
     setSubmitStatus(null);
-    let recaptchaData = null;
-    try {
-      const token = await new Promise<string>((resolve) => {
-        if (typeof window !== "undefined" && window.grecaptcha) {
-          window.grecaptcha.ready(() => {
-            window.grecaptcha
-              .execute(env.NEXT_PUBLIC_GOOGLE_RECAPTCHA_KEY, {
-                action: "submit",
-              })
-              .then(resolve);
-          });
-        }
-      });
 
-      const recaptchaResponse = await fetch("/api/verify-recaptcha", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
-      });
+    const isVerified = await verifyRecaptcha();
 
-      recaptchaData = await recaptchaResponse.json();
-    } catch (error) {
-      logger({
-        message: "Server error during reCAPTCHA verification",
-        context: error,
-      }).error();
-    }
-
-    if (recaptchaData.success) {
+    if (isVerified) {
       try {
         const response = await fetch("/api/contact", {
           method: "POST",
@@ -79,10 +55,11 @@ const Contact = () => {
           context: error,
         }).error();
         setSubmitStatus("error");
-      } finally {
-        setIsLoading(false);
       }
+    } else {
+      setSubmitStatus("error");
     }
+    setIsLoading(false);
   };
   return (
     <section id="contact" className="overflow-hidden py-16 md:py-20 lg:py-28">
