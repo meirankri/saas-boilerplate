@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 
 import { validateSession } from "@/lib/lucia";
 import { SignForm } from "@/components/SignForm";
+import { headers } from "next/headers";
 
 export const metadata: Metadata = {
   title: "Sign In Page | Free Next.js Template for Startup and SaaS",

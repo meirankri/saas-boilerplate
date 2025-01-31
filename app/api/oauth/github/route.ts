@@ -23,7 +23,7 @@ export const GET = async (req: NextRequest) => {
       );
     }
 
-    const savedState = cookies().get("state")?.value;
+    const savedState = (await cookies()).get("state")?.value;
 
     if (!savedState) {
       return Response.json(
@@ -63,13 +63,13 @@ export const GET = async (req: NextRequest) => {
     });
     const sessionCookie = lucia.createSessionCookie(session.id);
 
-    cookies().set(
+    (await cookies()).set(
       sessionCookie.name,
       sessionCookie.value,
       sessionCookie.attributes
     );
 
-    cookies().set("state", "", {
+    (await cookies()).set("state", "", {
       expires: new Date(0),
     });
 

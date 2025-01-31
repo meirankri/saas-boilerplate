@@ -120,7 +120,7 @@ export const GET = async (req: NextRequest) => {
     });
     const sessionCookie = lucia.createSessionCookie(session.id);
 
-    cookies().set(
+    (await cookies()).set(
       sessionCookie.name,
       sessionCookie.value,
       sessionCookie.attributes

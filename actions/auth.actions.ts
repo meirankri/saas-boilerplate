@@ -20,7 +20,7 @@ export const signOut = async () => {
 
     const sessionCookie = lucia.createBlankSessionCookie();
 
-    cookies().set(
+    (await cookies()).set(
       sessionCookie.name,
       sessionCookie.value,
       sessionCookie.attributes
@@ -41,11 +41,11 @@ export const createGoogleAuthorizationURL = async () => {
     const state = generateState();
     const codeVerifier = generateCodeVerifier();
 
-    cookies().set("codeVerifier", codeVerifier, {
+    (await cookies()).set("codeVerifier", codeVerifier, {
       httpOnly: true,
     });
 
-    cookies().set("state", state, {
+    (await cookies()).set("state", state, {
       httpOnly: true,
     });
 
@@ -76,7 +76,7 @@ export const createGithubAuthorizationURL = async () => {
   try {
     const state = generateState();
 
-    cookies().set("state", state, {
+    (await cookies()).set("state", state, {
       httpOnly: true,
     });
 
@@ -123,7 +123,7 @@ export const createFacebookAuthorizationURL = async () => {
 };
 
 export async function updateSessionCookie() {
-  const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
+  const sessionId = (await cookies()).get(lucia.sessionCookieName)?.value ?? null;
 
   if (sessionId) {
     const { session, user } = await lucia.validateSession(sessionId);
@@ -139,7 +139,7 @@ export async function updateSessionCookie() {
 
       if (session.fresh) {
         const sessionCookie = lucia.createSessionCookie(session.id);
-        cookies().set(
+        (await cookies()).set(
           sessionCookie.name,
           sessionCookie.value,
           sessionCookie.attributes
@@ -147,7 +147,7 @@ export async function updateSessionCookie() {
       }
     } else {
       const sessionCookie = lucia.createBlankSessionCookie();
-      cookies().set(
+      (await cookies()).set(
         sessionCookie.name,
         sessionCookie.value,
         sessionCookie.attributes

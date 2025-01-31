@@ -3,10 +3,6 @@ import { Link } from "@/i18n.config";
 import LocaleSwitcher from "../LanguageSwitcher";
 import { getLocale } from "next-intl/server";
 import { Locale } from "@/i18n.config";
-import FacebookIcon from "/public/svgs/facebookIcon.svg";
-import TwitterIcon from "/public/svgs/twitterIcon.svg";
-import YoutubeIcon from "/public/svgs/youtubeIcon.svg";
-import LinkedinIcon from "/public/svgs/linkedinIcon.svg";
 
 const Footer = async () => {
   const locale = (await getLocale()) as Locale;
@@ -47,28 +43,48 @@ const Footer = async () => {
                     aria-label="social-link"
                     className="dark:text-body-color-dark mr-6 text-body-color duration-300 hover:text-primary dark:hover:text-primary"
                   >
-                    <FacebookIcon className="fill-current" />
+                    <Image
+                      src="/images/facebookIcon.svg"
+                      alt="Facebook"
+                      width={24}
+                      height={24}
+                    />
                   </a>
                   <a
                     href="/"
                     aria-label="social-link"
                     className="dark:text-body-color-dark mr-6 text-body-color duration-300 hover:text-primary dark:hover:text-primary"
                   >
-                    <TwitterIcon className="fill-current" />
+                    <Image
+                      src="/svgs/twitterIcon.svg"
+                      alt="Twitter"
+                      width={24}
+                      height={24}
+                    />
                   </a>
                   <a
                     href="/"
                     aria-label="social-link"
                     className="dark:text-body-color-dark mr-6 text-body-color duration-300 hover:text-primary dark:hover:text-primary"
                   >
-                    <YoutubeIcon className="fill-current" />
+                    <Image
+                      src="/svgs/youtubeIcon.svg"
+                      alt="Youtube"
+                      width={24}
+                      height={24}
+                    />
                   </a>
                   <a
                     href="/"
                     aria-label="social-link"
                     className="dark:text-body-color-dark text-body-color duration-300 hover:text-primary dark:hover:text-primary"
                   >
-                    <LinkedinIcon className="fill-current" />
+                    <Image
+                      src="/svgs/linkedinIcon.svg"
+                      alt="Linkedin"
+                      width={24}
+                      height={24}
+                    />
                   </a>
                 </div>
                 <div className="mt-5">

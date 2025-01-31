@@ -19,8 +19,8 @@ async function validateSession(
     return null;
   }
 
-  const codeVerifier = cookies().get("codeVerifier")?.value;
-  const savedState = cookies().get("state")?.value;
+  const codeVerifier = (await cookies()).get("codeVerifier")?.value;
+  const savedState = (await cookies()).get("state")?.value;
 
   if (!codeVerifier || !savedState || savedState !== state) {
     return null;
@@ -52,7 +52,7 @@ async function createSessionAndSetCookies(userId: string) {
     expiresIn: 60 * 60 * 24 * 30,
   });
   const sessionCookie = lucia.createSessionCookie(session.id);
-  const cookieHeader = cookies();
+  const cookieHeader = await cookies();
 
   cookieHeader.set(
     sessionCookie.name,
@@ -71,7 +71,7 @@ export const GET = async (req: NextRequest) => {
     }
 
     const { code } = validatedRequest;
-    const codeVerifier = cookies().get("codeVerifier")?.value;
+    const codeVerifier = (await cookies()).get("codeVerifier")?.value;
 
     const { accessToken, accessTokenExpiresAt, refreshToken } =
       await google.validateAuthorizationCode(code, codeVerifier);
