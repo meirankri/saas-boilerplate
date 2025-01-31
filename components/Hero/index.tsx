@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+
 import Link from "next/link";
 
 const Hero = async () => {
@@ -8,7 +9,6 @@ const Hero = async () => {
       <section
         id="home"
         className="dark:bg-gray-dark relative z-10 overflow-hidden bg-white pb-16 pt-[120px] md:pb-[120px] md:pt-[150px] xl:pb-[160px] xl:pt-[180px] 2xl:pb-[200px] 2xl:pt-[210px]"
-        suppressHydrationWarning
       >
         <div className="container">
           <div className="-mx-4 flex flex-wrap">

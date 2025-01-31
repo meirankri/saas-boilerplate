@@ -44,7 +44,7 @@ const Footer = async () => {
                     className="dark:text-body-color-dark mr-6 text-body-color duration-300 hover:text-primary dark:hover:text-primary"
                   >
                     <Image
-                      src="/images/facebookIcon.svg"
+                      src="/svgs/facebookIcon.svg"
                       alt="Facebook"
                       width={24}
                       height={24}
