@@ -29,18 +29,27 @@ Follow these steps to get your SaaS project up and running on your local machine
    ```bash
    git clone https://github.com/meirankri/saas-boilerplate.git
    cd your-project
-   ``
+   ```
 
 2. **Install dependencies**
 
    ```bash
-   npm install || yarn 
+   npm install || yarn
    ```
 
 3. **Environment setup**
 
    Copy the .env.exemple to .env update it with your credentials:
 
+   ```env
+   CLOUDFLARE_ACCOUNT_ID=your_account_id
+   CLOUDFLARE_ACCESS_KEY=your_access_key
+   CLOUDFLARE_SECRET_KEY=your_secret_key
+   CLOUDFLARE_BUCKET=your_bucket_name
+   NEXT_PUBLIC_MAX_FILE_SIZE=5 # Maximum file size in MB
+   CLOUDFLARE_REGION=auto
+   CLOUDFLARE_URL=https://<your-account-id>.r2.cloudflarestorage.com
+   ```
 
 4. **Database setup**
 
@@ -62,7 +71,7 @@ Follow these steps to get your SaaS project up and running on your local machine
 
 ### Get the updates
 
- 1. **Add New Remote for This Repository**
+1.  **Add New Remote for This Repository**
 
 After cloning, rename the original remote and add the new repository's URL as `origin`:
 
@@ -81,7 +90,7 @@ To push the cloned repository to your new GitHub repository:
 git push -u origin main
 ```
 
- 3. **Keep Your Repository Updated with Rebase**
+3.  **Keep Your Repository Updated with Rebase**
 
 Whenever there are updates in the original repository, you can update your fork by fetching the changes and rebasing:
 
@@ -137,13 +146,14 @@ To manage payments, follow these steps:
            { isActive: false, label: "6TB storage" },
          ],
          products: [
-           { name: "Product 1", quota:10 },
-           { name: "Product 2" , quota: 20},
+           { name: "Product 1", quota: 10 },
+           { name: "Product 2", quota: 20 },
          ],
        },
      ],
      // Add more plans as needed
    };
+   ```
 
 3. run yarn createProduct to populate the database
 
@@ -162,3 +172,58 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Hire Me
 
 Are you looking for a developer to bring your next project to life or enhance your team? I specialize in full-stack development and am eager to help make your vision a reality. Let's connect! Contact me at [meirankri@gmail.com](mailto:meirankri+saasboilerplate@gmail.com) for consultancy or potential collaborations.
+
+2. **Database Schema**
+
+   The boilerplate includes a Document model in the Prisma schema for tracking uploaded files:
+
+   ```prisma
+   model Document {
+     id          String   @id @default(uuid())
+     fileName    String
+     fileUrl     String
+     fileSize    Int
+     mimeType    String
+     entityId    String
+     entityType  String
+     createdAt   DateTime @default(now())
+     updatedAt   DateTime @updatedAt
+     createdBy   String
+
+     @@index([entityId, entityType])
+     @@index([createdBy])
+   }
+   ```
+
+3. **Using the Upload Component**
+
+   The FileUpload component is ready to use in your pages:
+
+   ```typescript
+   import { FileUploadWrapper } from "@/components/FileUpload/FileUploadWrapper";
+
+   // In your component:
+   <FileUploadWrapper
+     entityId="your-entity-id"
+     entityType="your-entity-type"
+   />;
+   ```
+
+4. **Features Included**
+
+   - Drag and drop file upload
+   - File size validation
+   - Secure file storage in Cloudflare R2
+   - File deletion
+   - Signed URLs for secure file access
+   - Progress tracking and error handling
+   - i18n support for all messages
+   - TypeScript support
+
+5. **Security Considerations**
+
+   - Files are stored with unique names to prevent collisions
+   - Access is controlled through signed URLs
+   - File size limits are enforced both client and server-side
+   - Only authenticated users can upload and access files
+   - Files are organized by entity type and ID for better organization
