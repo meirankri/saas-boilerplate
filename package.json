@@ -10,6 +10,8 @@
     "createProduct": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/subscriptions.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.744.0",
+    "@aws-sdk/s3-request-presigner": "^3.744.0",
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
@@ -39,6 +41,7 @@
     "prisma": "^5.17.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
+    "react-dropzone": "^14.3.5",
     "react-hook-form": "^7.50.1",
     "resend": "^3.2.0",
     "sharp": "^0.33.5",

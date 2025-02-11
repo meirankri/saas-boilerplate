@@ -93,12 +93,12 @@ export function SignForm() {
       if (!res.success) {
         toast({
           variant: "destructive",
-          description: res.message,
+          description: t("recaptchaError"),
         });
       } else if (res.success) {
         toast({
           variant: "default",
-          description: res.message,
+          description: t("successMessage"),
         });
 
         router.push("/");
@@ -110,7 +110,7 @@ export function SignForm() {
       }).error();
       toast({
         variant: "destructive",
-        description: "An error occurred. Please try again.",
+        description: t("errorMessage"),
       });
     } finally {
       setIsLoading(false);

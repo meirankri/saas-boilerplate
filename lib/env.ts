@@ -32,6 +32,16 @@ const envSchema = z.object({
   JWT_SECRET: z.string().optional(),
   NEXT_PUBLIC_BASE_URL: z.string().url().optional().or(z.literal("")),
 
+  // Variables Cloudflare - Server Only
+  CLOUDFLARE_ACCOUNT_ID: z.string().optional(),
+  CLOUDFLARE_ACCESS_KEY: z.string().optional(),
+  CLOUDFLARE_SECRET_KEY: z.string().optional(),
+  CLOUDFLARE_BUCKET: z.string().optional(),
+  CLOUDFLARE_REGION: z.string().optional(),
+
+  // Variables Cloudflare - Public
+  CLOUDFLARE_URL: z.string().url().optional(),
+
   // Variables pour l'email
   EMAIL_SERVER_USER: z.string().optional(),
   EMAIL_SERVER_PASSWORD: z.string().optional(),
@@ -48,6 +58,12 @@ const envSchema = z.object({
 
   NEXT_PUBLIC_GOOGLE_RECAPTCHA_KEY: z.string().optional(),
   RECAPTCHA_SECRET_KEY: z.string().optional(),
+
+  // New variable
+  NEXT_PUBLIC_MAX_FILE_SIZE: z
+    .string()
+    .transform((val) => parseInt(val, 10) * 1024 * 1024)
+    .default("5"), // Valeur par défaut de 5MB
 });
 
 const processEnv = {
@@ -77,6 +93,13 @@ const processEnv = {
   NEXT_PUBLIC_GOOGLE_RECAPTCHA_KEY:
     process.env.NEXT_PUBLIC_GOOGLE_RECAPTCHA_KEY,
   RECAPTCHA_SECRET_KEY: process.env.RECAPTCHA_SECRET_KEY,
+  CLOUDFLARE_ACCOUNT_ID: process.env.CLOUDFLARE_ACCOUNT_ID,
+  CLOUDFLARE_ACCESS_KEY: process.env.CLOUDFLARE_ACCESS_KEY,
+  CLOUDFLARE_SECRET_KEY: process.env.CLOUDFLARE_SECRET_KEY,
+  CLOUDFLARE_BUCKET: process.env.CLOUDFLARE_BUCKET,
+  CLOUDFLARE_URL: process.env.CLOUDFLARE_URL,
+  CLOUDFLARE_REGION: process.env.CLOUDFLARE_REGION,
+  NEXT_PUBLIC_MAX_FILE_SIZE: process.env.NEXT_PUBLIC_MAX_FILE_SIZE,
 };
 
 const env = envSchema.parse(processEnv);

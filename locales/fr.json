@@ -16,7 +16,10 @@
         "googleSignIn": "Se connecter avec Google",
         "facebookSignIn": "Se connecter avec Facebook",
         "githubSignIn": "Se connecter avec Github",
-        "description": "Connectez-vous à votre compte pour un checkout plus rapide."
+        "description": "Connectez-vous à votre compte pour un checkout plus rapide.",
+        "recaptchaError": "Erreur de vérification reCAPTCHA. Veuillez réessayer.",
+        "successMessage": "Le lien de connexion a été envoyé à votre email.",
+        "errorMessage": "Une erreur est survenue. Veuillez réessayer."
     },
     "UserMenu": {
         "signOut": "Se déconnecter",
@@ -71,5 +74,36 @@
         "product_support_premium_24_7": "Support Premium 24/7",
         "product_tool_builder": "Constructeur d'Outils",
         "product_storage": "Stockage"
+    },
+    "FileManagement": {
+        "deleteConfirmation": "Êtes-vous sûr de vouloir supprimer ce fichier ?",
+        "deleteConfirmButton": "Supprimer",
+        "deleteCancelButton": "Annuler",
+        "deleteSuccess": "Fichier supprimé avec succès",
+        "deleteError": "Erreur lors de la suppression",
+        "downloadError": "Erreur lors du téléchargement",
+        "loading": "Chargement...",
+        "download": "Télécharger",
+        "delete": "Supprimer",
+        "noFiles": "Aucun fichier téléversé",
+        "yourFiles": "Vos fichiers",
+        "uploadTitle": "Téléverser un fichier",
+        "uploadMessage": "Glissez et déposez un fichier ici, ou cliquez pour sélectionner"
+    },
+    "FileUpload": {
+        "upload": "Téléverser",
+        "uploading": "Téléversement...",
+        "uploadSuccess": "Fichier téléversé avec succès",
+        "uploadError": "Erreur lors du téléversement",
+        "uploadCancel": "Annuler",
+        "fileTooLarge": "Le fichier est trop volumineux. La taille maximale est de {maxSize} MB",
+        "maxFileSize": "Taille maximale : {maxSize} MB"
+    },
+    "FileDisplay": {
+        "delete": "Supprimer",
+        "deleteConfirmation": "Êtes-vous sûr de vouloir supprimer ce fichier ?",
+        "deleteSuccess": "Fichier supprimé avec succès",
+        "deleteError": "Erreur lors de la suppression",
+        "deleteCancel": "Annuler"
     }
 }

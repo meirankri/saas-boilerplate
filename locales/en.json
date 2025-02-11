@@ -16,7 +16,10 @@
         "googleSignIn": "Sign in with Google",
         "facebookSignIn": "Sign in with Facebook",
         "githubSignIn": "Sign in with Github",
-        "description": "Login to your account for a faster checkout."
+        "description": "Login to your account for a faster checkout.",
+        "recaptchaError": "Error verifying reCAPTCHA. Please try again.",
+        "successMessage": "The login link has been sent to your email.",
+        "errorMessage": "An error occurred. Please try again."
     },
     "UserMenu": {
         "signOut": "Sign out",
@@ -71,5 +74,36 @@
         "product_support_premium_24_7": "24/7 Premium Support",
         "product_tool_builder": "Tool Builder",
         "product_storage": "Storage"
+    },
+    "FileManagement": {
+        "deleteConfirmation": "Are you sure you want to delete this file?",
+        "deleteConfirmButton": "Delete",
+        "deleteCancelButton": "Cancel",
+        "deleteSuccess": "File deleted successfully",
+        "deleteError": "Error deleting file",
+        "downloadError": "Error downloading file",
+        "loading": "Loading...",
+        "download": "Download",
+        "delete": "Delete",
+        "noFiles": "No files uploaded",
+        "yourFiles": "Your files",
+        "uploadTitle": "Upload a file",
+        "uploadMessage": "Drag and drop a file here, or click to select"
+    },
+    "FileUpload": {
+        "upload": "Upload your file",
+        "uploading": "Uploading...",
+        "uploadSuccess": "File uploaded successfully",
+        "uploadError": "Error uploading file",
+        "uploadCancel": "Cancel",
+        "fileTooLarge": "File is too large. Maximum size is {maxSize} MB",
+        "maxFileSize": "Maximum size: {maxSize} MB"
+    },
+    "FileDisplay": {
+        "delete": "Delete",
+        "deleteConfirmation": "Are you sure you want to delete this file?",
+        "deleteSuccess": "File deleted successfully",
+        "deleteError": "Error deleting file",
+        "deleteCancel": "Cancel"
     }
 }

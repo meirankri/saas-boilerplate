@@ -35,7 +35,7 @@ const UserMenu = () => {
             />
           ) : (
             <span className="h-8 w-8 rounded-full dark:text-black  bg-white flex justify-center items-center">
-              {user.email.slice(0, 1)}
+              {user?.email?.slice(0, 1)}
             </span>
           )}
         </MenuButton>

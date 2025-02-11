@@ -107,3 +107,19 @@ model Session {
 
   user User @relation(references: [id], fields: [userId], onDelete: Cascade)
 }
+
+model Document {
+  id          String   @id @default(uuid())
+  fileName    String
+  fileUrl     String
+  fileSize    Int
+  mimeType    String
+  entityId    String   // ID de l'entité associée
+  entityType  String   // Type de l'entité (ex: "User", "Product", etc.)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String   // ID de l'utilisateur qui a créé le document
+
+  @@index([entityId, entityType])
+  @@index([createdBy])
+}
