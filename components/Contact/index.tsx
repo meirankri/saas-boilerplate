@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import NewsLatterBox from "./NewsLatterBox";
-import env from "@/lib/env";
 import { logger } from "@/utils/logger";
 import { verifyRecaptcha } from "@/utils/recaptcha";
+import { trpc } from "@/app/_trpc/client";
+import { TRPCClientError } from "@trpc/client";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -12,10 +13,13 @@ const Contact = () => {
     email: "",
     message: "",
   });
+  const mutation = trpc.contact.useMutation();
+
   const [isLoading, setIsLoading] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(
     null
   );
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -36,28 +40,30 @@ const Contact = () => {
 
     if (isVerified) {
       try {
-        const response = await fetch("/api/contact", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        });
-        if (response.ok) {
+        const response = await mutation.mutateAsync(formData);
+        if (response.success) {
           setFormData({ name: "", email: "", message: "" });
           setSubmitStatus("success");
+        }
+      } catch (error: unknown) {
+        if (error instanceof TRPCClientError) {
+          const parsedErrors = JSON.parse(error.message);
+          console.log("errors", parsedErrors);
+          const errors = parsedErrors.map((error: any) => error.message);
+          setSubmitStatus("error");
+          setErrorMessage(errors.join(", "));
         } else {
           setSubmitStatus("error");
+          setErrorMessage("Failed to send message");
+          logger({
+            message: "Server error during contact form submission",
+            context: error,
+          }).error();
         }
-      } catch (error) {
-        logger({
-          message: "Server error during contact form submission",
-          context: error,
-        }).error();
-        setSubmitStatus("error");
       }
     } else {
       setSubmitStatus("error");
+      setErrorMessage("Failed to send message");
     }
     setIsLoading(false);
   };
@@ -81,7 +87,7 @@ const Contact = () => {
                 <p className="mb-4 text-green-600">Message sended</p>
               )}
               {submitStatus === "error" && (
-                <p className="mb-4 text-red-600">Error sending message</p>
+                <p className="mb-4 text-red-600">{errorMessage}</p>
               )}
               <form onSubmit={handleSubmit}>
                 <div className="-mx-4 flex flex-wrap">

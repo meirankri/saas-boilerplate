@@ -11,6 +11,7 @@ import { QuotaProvider } from "@/providers/QuotaProvider";
 import SessionUpdater from "@/components/auth/SessionUpdater";
 import Script from "next/script";
 import env from "@/lib/env";
+import { TRPCProvider } from "@/app/_trpc/Provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -39,11 +40,13 @@ export default async function LocaleLayout(
       <body className={inter.className} suppressHydrationWarning>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider>
-            <SessionProvider value={user || {}}>
-              <SessionUpdater />
-              <QuotaProvider>{children}</QuotaProvider>
-              <Toaster />
-            </SessionProvider>
+            <TRPCProvider>
+              <SessionProvider value={user || {}}>
+                <SessionUpdater />
+                <QuotaProvider>{children}</QuotaProvider>
+                <Toaster />
+              </SessionProvider>
+            </TRPCProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
         <Script
