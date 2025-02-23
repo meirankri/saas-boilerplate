@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { validateSession } from "@/lib/lucia";
 import { db } from "@/lib/database/db";
-import { CloudflareStorageService } from "@/lib/storage/CloudflareStorageService";
+import { FirebaseStorageService } from "@/lib/storage/FirebaseStorageService";
 import { logger } from "@/utils/logger";
 
 export async function DELETE(
@@ -35,8 +35,8 @@ export async function DELETE(
     }
 
     try {
-      const storageService = new CloudflareStorageService();
-      const filePath = `${document.entityType}/${document.entityId}/${document.fileName}`;
+      const storageService = new FirebaseStorageService();
+      const filePath = `${document.fileName}`;
       await storageService.deleteFile(filePath);
       await db.document.delete({
         where: { id: id as string },
@@ -45,7 +45,7 @@ export async function DELETE(
       return NextResponse.json({ success: true });
     } catch (cloudflareError) {
       logger({
-        message: "Cloudflare delete error",
+        message: "Storage delete error",
         context: cloudflareError,
       }).error();
       return NextResponse.json(

@@ -23,10 +23,11 @@ export function FileDisplay({
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const t = useTranslations("FileManagement");
+
   const getFile = async () => {
     try {
       setIsLoading(true);
-      const fullPath = `${entityType}/${entityId}/${fileName}`;
+      const fullPath = `${fileName}`;
 
       const response = await fetch("/api/files/get-signed-url", {
         method: "POST",

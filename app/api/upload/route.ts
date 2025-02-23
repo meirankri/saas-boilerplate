@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { CloudflareStorageService } from "@/lib/storage/CloudflareStorageService";
+import { FirebaseStorageService } from "@/lib/storage/FirebaseStorageService";
 import { validateSession } from "@/lib/lucia";
 import { db } from "@/lib/database/db";
 import { StorageService } from "@/lib/storage/StorageService";
@@ -16,10 +16,10 @@ export async function POST(request: Request) {
     let storageService: StorageService;
 
     try {
-      storageService = new CloudflareStorageService();
+      storageService = new FirebaseStorageService();
     } catch (error) {
       logger({
-        message: "Error initializing Cloudflare storage service",
+        message: "Error initializing Firebase storage service",
         context: error,
       }).error();
       return NextResponse.json(

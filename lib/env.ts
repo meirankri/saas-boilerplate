@@ -59,6 +59,14 @@ const envSchema = z.object({
   NEXT_PUBLIC_GOOGLE_RECAPTCHA_KEY: z.string().optional(),
   RECAPTCHA_SECRET_KEY: z.string().optional(),
 
+  // Variables Firebase
+  FIREBASE_API_KEY: z.string().optional(),
+  FIREBASE_AUTH_DOMAIN: z.string().optional(),
+  FIREBASE_PROJECT_ID: z.string().optional(),
+  FIREBASE_STORAGE_BUCKET: z.string().optional(),
+  FIREBASE_MESSAGING_SENDER_ID: z.string().optional(),
+  FIREBASE_APP_ID: z.string().optional(),
+
   // New variable
   NEXT_PUBLIC_MAX_FILE_SIZE: z
     .string()
@@ -100,6 +108,12 @@ const processEnv = {
   CLOUDFLARE_URL: process.env.CLOUDFLARE_URL,
   CLOUDFLARE_REGION: process.env.CLOUDFLARE_REGION,
   NEXT_PUBLIC_MAX_FILE_SIZE: process.env.NEXT_PUBLIC_MAX_FILE_SIZE,
+  FIREBASE_API_KEY: process.env.FIREBASE_API_KEY,
+  FIREBASE_AUTH_DOMAIN: process.env.FIREBASE_AUTH_DOMAIN,
+  FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID,
+  FIREBASE_STORAGE_BUCKET: process.env.FIREBASE_STORAGE_BUCKET,
+  FIREBASE_MESSAGING_SENDER_ID: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  FIREBASE_APP_ID: process.env.FIREBASE_APP_ID,
 };
 
 const env = envSchema.parse(processEnv);

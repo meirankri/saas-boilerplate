@@ -8,7 +8,7 @@ export const logger = ({
   return {
     info: () => console.log(message, context),
     error: () => {
-      process.env.NODE_ENV !== "production" && console.error(message, context);
+      console.error(message, context);
     },
     warn: () => console.warn(message, context),
   };

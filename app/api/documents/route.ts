@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { validateSession } from "@/lib/lucia";
 import { db } from "@/lib/database/db";
 import { logger } from "@/utils/logger";
+
 export async function GET() {
   try {
     const { user } = await validateSession();

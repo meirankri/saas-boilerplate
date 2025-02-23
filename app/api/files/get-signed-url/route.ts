@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import { validateSession } from "@/lib/lucia";
-import { getSignedFileUrl } from "@/utils/cloudflare";
-import env from "@/lib/env";
-import { CloudflareStorageService } from "@/lib/storage/CloudflareStorageService";
 import { logger } from "@/utils/logger";
+import { FirebaseStorageService } from "@/lib/storage/FirebaseStorageService";
+
 export async function POST(request: Request) {
   try {
     const { user } = await validateSession();
@@ -21,9 +20,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const storageService = new CloudflareStorageService();
+    const storageService = new FirebaseStorageService();
 
-    const signedUrl = await storageService.getSignedFileUrl(fileName);
+    const signedUrl = await storageService.getFileURL(fileName);
 
     return NextResponse.json({ url: signedUrl });
   } catch (error) {
